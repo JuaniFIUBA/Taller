@@ -42,27 +42,48 @@ fn guardar_error_y_salir(mensaje: &str, file_path_destino: &str) -> Result<(), B
     archivo.write_all(mensaje_formateado.as_bytes())?;
     Ok(())
 }
+
 fn main() -> Result<(), Box<dyn Error>> {
     
     let args: Vec<String> = env::args().collect();
     let file_path_origen = format!("{}", args[1]);
     let file_path_destino: String = format!("{}{}", args[2], args[1]);
-    let x = args[3].parse::<i32>().map_err(|err| format!("Error al parsear x a i32, {}", err))?;
-    let y = args[4].parse::<i32>().map_err(|err| format!("Error al parsear y a i32, {}", err))?;
+    if let Err(x) = args[3].parse::<i32>().map_err(|err|format!("Error al parsear x, {}", err)) {}
+    // let x = args[3].parse::<i32>().map_err(|err| format!("Error al parsear x a i32"))
+    //     .unw;
+    // let x = match args[3].parse::<i32>().map_err(|err| format!("Error al parsear x a i32, {}", err)) {
+    //     Ok(x) => {x},
+    //     Err(err) => {
+    //         guardar_error_y_salir(&err, &file_path_destino)?;
+    //         return Err(Box::new(std::io::Error::new(std::io::ErrorKind::Other, err)));
+    //     }
+    // };
+    let y = match args[4].parse::<i32>().map_err(|err| format!("Error al parsear y a i32, {}", err)) {
+        Ok(x) => {x},
+        Err(err) => {
+            guardar_error_y_salir(&err, &file_path_destino)?;
+            return Err(Box::new(std::io::Error::new(std::io::ErrorKind::Other, err)));
+        }
+    };
     // MANEJAR EL INPUT EN UNA FUNCION
 
-    // let result_mapa = Mapa::crear_mapa(&file_path_origen);
-    let mut mapa = match Mapa::crear_mapa(&file_path_origen) {
+    let mut mapa = match Mapa::crear_mapa(&file_path_origen).map_err(|err| format!("Error al crear el mapa {}", err)) {
         Ok(mapa) => mapa,
         Err(err) => {
-            let err_msj = format!("Error al crear el mapa, {}", err); 
-            guardar_error_y_salir(&err_msj, &file_path_destino)?;
-                return Err(Box::new(std::io::Error::new(std::io::ErrorKind::Other, "Error al crear el mapa")));}
+            guardar_error_y_salir(&err, &file_path_destino)?;
+                return Err(Box::new(std::io::Error::new(std::io::ErrorKind::Other, err)));}
     };
     mapa.mostrar_mapa();
 
-    let bomba = mapa.obtener_celda(y as usize, x as usize)
-                            .map_err(|err| format!("Error, no hayu na bomba {}", err))?;
+    let celda_result = mapa.obtener_celda(y as usize, x as usize)
+                                    .map_err(|err| format!("Error, no hay ninguna bomba en la posicion elegida. {}", err));
+    let bomba = match celda_result {
+        Ok(bomba) => bomba,
+        Err(err) => {
+            guardar_error_y_salir(&err, &file_path_destino)?;
+            return Err(Box::new(std::io::Error::new(std::io::ErrorKind::Other, err)));}
+    };
+
     match bomba {
         Celda::Bomba { representacion: _, alcance, de_traspaso } => {
             match Explosion::new(*alcance as i32, *de_traspaso).iniciar_explosion(&mut mapa, y, x) {
