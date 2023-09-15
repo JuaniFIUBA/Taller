@@ -1,6 +1,6 @@
 use std::fs::File;
 use std::io::{self, Write, BufRead};
-use crate::{Celda, ErrorTypeNotFound};
+use crate::{Celda};
 use crate::Enemigo;
 pub struct Mapa {
     grilla: Vec<Vec<Celda>>,
@@ -8,6 +8,10 @@ pub struct Mapa {
 
 
 impl Mapa {
+    pub fn new(grilla: Vec<Vec<Celda>>) -> Mapa {
+        Mapa { grilla }
+    }
+    
     pub fn  crear_mapa(file_path: &str) -> Result<Mapa, Box<dyn std::error::Error>> {
         // Abre el archivo en modo lectura
         let file = File::open(file_path).map_err(|err| format!("Error al abrir el archivo{}", err))?;
@@ -25,8 +29,7 @@ impl Mapa {
             // Itera a través de las palabras y las pushea al el vector cols
             
             for palabra in palabras {
-                cols.push(crear_objeto(palabra, &mut cant_enemigos) 
-                    .map_err(|err| format!("Error, no se reconoce el objeto {}", err))?);
+                cols.push(crear_objeto(palabra, &mut cant_enemigos)?);
             }
             filas.push(cols);
         }
@@ -104,6 +107,43 @@ fn crear_objeto(palabra: &str, cant_enemigos: &mut u32) -> Result<Celda, Box<dyn
             let dir = palabra.chars().nth(1).ok_or("Dirección inválida")?;
             Ok(Celda::Desvio { representacion: obj, direccion: dir })
         },
-        _ => {Err(Box::new(ErrorTypeNotFound::new("Tipo no reconocido")))} // aca va error
+        _ => {Err(Box::new(std::io::Error::new(std::io::ErrorKind::Other, "Objeto no reconocido")))} // aca va error
     }
+}
+
+
+#[cfg(test)] 
+mod test {
+    use super::*;
+    #[test]
+    fn test_obtener_celda() -> Result<(), Box<dyn std::error::Error>> {
+        let mut mapa = Mapa::new(vec![vec![Celda::Vacio { representacion: '_' }]]);
+        assert_eq!(mapa.obtener_celda(0, 0)?, &mut Celda::Vacio { representacion: '_' });
+        Ok(())
+    }
+
+    #[test]
+    fn crea_vacio() -> Result<(), Box<dyn std::error::Error>>{
+        assert_eq!(Celda::Vacio { representacion: '_' }, crear_objeto(&'_'.to_string(), &mut 0)?);
+        Ok(())
+    }
+    #[test]
+    fn crea_bomba() -> Result<(), Box<dyn std::error::Error>>{
+        let bomba = Celda::Bomba { representacion: 'B', alcance: 1, de_traspaso: false };
+        assert_eq!(bomba , crear_objeto(&"B1".to_string(), &mut 0)?);
+        Ok(())
+    }
+    //    #[test]
+    // fn crea_vacio() -> Result<(), Box<dyn std::error::Error>>{
+    //     assert_eq!(Celda::Vacio { representacion: '_' }, crear_objeto(&'_'.to_string(), &mut 0)?);
+    //     Ok(())
+    // }   #[test]
+    // fn crea_vacio() -> Result<(), Box<dyn std::error::Error>>{
+    //     assert_eq!(Celda::Vacio { representacion: '_' }, crear_objeto(&'_'.to_string(), &mut 0)?);
+    //     Ok(())
+    // }   #[test]
+    // fn crea_vacio() -> Result<(), Box<dyn std::error::Error>>{
+    //     assert_eq!(Celda::Vacio { representacion: '_' }, crear_objeto(&'_'.to_string(), &mut 0)?);
+    //     Ok(())
+    // }
 }

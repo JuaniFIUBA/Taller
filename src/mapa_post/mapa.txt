@@ -1,1 +1,4 @@
-ERROR: [Error, no hay ninguna bomba en la posicion elegida. La celda elegida está fuera de rango]
+_ _ R F1
+W F1 F2 _
+F1 _ _ _
+DR F1 _ _

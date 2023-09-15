@@ -1,1 +1,0 @@
-ERROR: [No hay una bomba en la posicion elegida]

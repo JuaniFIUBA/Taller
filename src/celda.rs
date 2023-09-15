@@ -1,5 +1,5 @@
 use crate::Enemigo;
-
+#[derive(Debug, PartialEq)]
 pub enum Celda {
     Vacio{representacion: char}, 
     Bomba{representacion: char, alcance: usize, de_traspaso: bool},
