@@ -17,7 +17,6 @@ impl Explosion {
     }
     pub fn iniciar_explosion(&mut self, mapa: &mut Mapa ,fila: i32, columna: i32) {        
         mapa.borrar(fila as usize, columna as usize);
-        println!("{}", self.alcance);
         self.explotar_al_sur(mapa, fila, columna, self.alcance);
         self.explotar_al_norte(mapa, fila, columna, self.alcance);
         self.explotar_al_este(mapa, fila, columna, self.alcance);
@@ -92,7 +91,6 @@ impl Explosion {
                 } 
                 true},
             Celda::Desvio { representacion: _, direccion } => {
-                println!("Contador: {}", cont);
                 match direccion {
                     'U' => {self.explotar_al_norte(mapa, fila as i32, columna as i32, self.alcance - *cont);},
                     'D' => {self.explotar_al_sur(mapa, fila as i32, columna as i32, self.alcance - *cont);},

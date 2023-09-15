@@ -1,7 +1,7 @@
 use std::fs::File;
-use std::io::{self, BufRead, Write};
+use std::io::{Write};
 use std::error::Error;
-use std::fmt;
+use std::{fmt, result};
 use std::env;
 
 
@@ -14,7 +14,9 @@ use explosion::Explosion;
 mod enemigo;
 use enemigo::Enemigo;
 
+enum Errores {
 
+}
 #[derive(Debug)]
 struct ErrorTypeNotFound {
     mensaje: String
@@ -36,39 +38,44 @@ impl fmt::Display for ErrorTypeNotFound {
     }
 }
 
-// fn guardar_error_y_salir(mensaje_error: &str, nombre_archivo: &str) -> Result<(), Box<dyn Error>> {
-//     let mut archivo = File::create(nombre_archivo)?;
-//     let mensaje_formateado = format!("ERROR: [{}]", mensaje_error);
-//     archivo.write_all(mensaje_formateado.as_bytes());
-//     Ok(())
-// // }
-fn guardar_error_y_salir<T: Error + 'static>(mensaje: &str, nombre_archivo: &str, error: T) -> Result<(), Box<dyn Error>> {
-    let mut archivo = File::create(nombre_archivo)?;
+fn guardar_error_y_salir(mensaje: &str, file_path_destino: &str) -> Result<(), Box<dyn Error>> {
+    let mut archivo = File::create(file_path_destino)?;
     let mensaje_formateado = format!("ERROR: [{}]", mensaje);
     archivo.write_all(mensaje_formateado.as_bytes())?;
-    Err(Box::new(error))
+    Ok(())
 }
 fn main() -> Result<(), Box<dyn Error>> {
     
     let args: Vec<String> = env::args().collect();
-    let file_path = format!("{}/{}", args[2], args[1]);
+    let file_path_origen = format!("{}", args[1]);
+    let file_path_destino: String = format!("{}{}", args[2], args[1]);
+    let x = args[3].parse::<i32>().map_err(|err| format!("Error al parsear x a i32, {}", err))?;
+    let y = args[4].parse::<i32>().map_err(|err| format!("Error al parsear y a i32, {}", err))?;
+    // MANEJAR EL INPUT EN UNA FUNCION
 
-
-    let mut  mapa = Mapa::crear_mapa(&file_path)?;
+    let result_mapa = Mapa::crear_mapa(&file_path_origen);
+    let mut mapa = match result_mapa {
+        Ok(mapa) => mapa,
+        Err(err) => {
+            let err_msj = format!("Error al crear el mapa, {}", err); 
+            guardar_error_y_salir(&err_msj, &file_path_destino)?;
+                return Err(Box::new(std::io::Error::new(std::io::ErrorKind::Other, "Error al crear el mapa")));}
+    };
     mapa.mostrar_mapa();
-    let bomba = mapa.obtener_celda(0, 0);
+    let bomba = mapa.obtener_celda(y as usize, x as usize);
     match bomba {
         Celda::Bomba { representacion: _, alcance, de_traspaso } => {
-            Explosion::new(*alcance as i32, *de_traspaso).iniciar_explosion(&mut mapa, 0, 0)
+            Explosion::new(*alcance as i32, *de_traspaso).iniciar_explosion(&mut mapa, y, x)
         },
         _ => {
-            return guardar_error_y_salir("Tipo de objeto invalido", &file_path,std::io::Error::new(std::io::ErrorKind::Other, "Tipo de objeto invalido"));
+            guardar_error_y_salir("No hay una bomba en la posicion elegida", &file_path_destino)?; 
+            return Err(Box::new(std::io::Error::new(std::io::ErrorKind::Other, "No hay una bomba en la posicion elegida")));
         }
     }
     println!("-------------------------");
     mapa.mostrar_mapa();
 
-    let _ = mapa.guardar_mapa("mapa2.txt");
+    let _ = mapa.guardar_mapa(&file_path_destino);
 
     Ok(())
 

@@ -1,6 +1,6 @@
 use std::fs::File;
 use std::io::{self, Write, BufRead};
-use crate::Celda;
+use crate::{Celda, ErrorTypeNotFound};
 use crate::Enemigo;
 pub struct Mapa {
     grilla: Vec<Vec<Celda>>,
@@ -10,7 +10,7 @@ pub struct Mapa {
 impl Mapa {
     pub fn  crear_mapa(file_path: &str) -> Result<Mapa, Box<dyn std::error::Error>> {
         // Abre el archivo en modo lectura
-        let file = File::open(file_path)?;
+        let file = File::open(file_path).map_err(|err| format!("Error al abrir el archivo{}", err))?;
         let reader = io::BufReader::new(file);
         let mut filas: Vec<Vec<Celda>> = Vec::new();
         let mut cant_enemigos: u32 = 0;
@@ -22,21 +22,21 @@ impl Mapa {
             
             // Divide la línea en palabras usando espacios como separadores        
             let palabras: Vec<&str> = line.split_whitespace().collect();
-            // Itera a través de las palabras e imprímelas
+            // Itera a través de las palabras y las pushea al el vector cols
             
             for palabra in palabras {
-                cols.push(crear_objeto(palabra, &mut cant_enemigos)?);
+                cols.push(crear_objeto(palabra, &mut cant_enemigos) 
+                    .map_err(|err| format!("Error, no se reconoce el objeto {}", err))?);
             }
             filas.push(cols);
         }
         Ok(Mapa{grilla: filas})
-        // Ok(filas)
     }
     
     pub fn obtener_largo(&self) -> usize {
         self.grilla.len()
     }
-    pub fn obtener_celda(&mut self, fila: usize, columna: usize) -> &mut Celda{
+    pub fn obtener_celda(&mut self, fila: usize, columna: usize) -> &mut Celda {
         &mut self.grilla[fila][columna]
     }
 
@@ -98,6 +98,6 @@ fn crear_objeto(palabra: &str, cant_enemigos: &mut u32) -> Result<Celda, Box<dyn
             let dir = palabra.chars().nth(1).ok_or("Dirección inválida")?;
             Ok(Celda::Desvio { representacion: obj, direccion: dir })
         },
-        _ => {Ok(Celda::Vacio{ representacion: obj })} // aca va error
+        _ => {Err(Box::new(ErrorTypeNotFound::new("Tipo no reconocido")))} // aca va error
     }
 }

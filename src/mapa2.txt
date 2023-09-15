@@ -1,3 +1,1 @@
-_ F1 DU
-W F2 DL
-DR F1 _
+ERROR: [No hay una bomba en la posicion elegida]
