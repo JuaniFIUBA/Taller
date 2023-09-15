@@ -36,8 +36,14 @@ impl Mapa {
     pub fn obtener_largo(&self) -> usize {
         self.grilla.len()
     }
-    pub fn obtener_celda(&mut self, fila: usize, columna: usize) -> &mut Celda {
-        &mut self.grilla[fila][columna]
+
+    // Al ser usize, la fila y columna no pueden ser menores a 0
+    pub fn obtener_celda(&mut self, fila: usize, columna: usize) -> Result<&mut Celda, Box<dyn std::error::Error>> {
+        if  fila > self.grilla.len() || columna > self.grilla.len() {
+            Err(Box::new(std::io::Error::new(std::io::ErrorKind::Other, "La celda elegida está fuera de rango")))
+        } else {
+            Ok(&mut self.grilla[fila][columna])
+        }
     }
 
     pub fn mostrar_mapa(&self) {

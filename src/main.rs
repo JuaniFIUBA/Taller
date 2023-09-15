@@ -1,7 +1,7 @@
 use std::fs::File;
-use std::io::{Write};
+use std::io::Write;
 use std::error::Error;
-use std::{fmt, result};
+use std::fmt;
 use std::env;
 
 
@@ -14,9 +14,7 @@ use explosion::Explosion;
 mod enemigo;
 use enemigo::Enemigo;
 
-enum Errores {
 
-}
 #[derive(Debug)]
 struct ErrorTypeNotFound {
     mensaje: String
@@ -53,8 +51,8 @@ fn main() -> Result<(), Box<dyn Error>> {
     let y = args[4].parse::<i32>().map_err(|err| format!("Error al parsear y a i32, {}", err))?;
     // MANEJAR EL INPUT EN UNA FUNCION
 
-    let result_mapa = Mapa::crear_mapa(&file_path_origen);
-    let mut mapa = match result_mapa {
+    // let result_mapa = Mapa::crear_mapa(&file_path_origen);
+    let mut mapa = match Mapa::crear_mapa(&file_path_origen) {
         Ok(mapa) => mapa,
         Err(err) => {
             let err_msj = format!("Error al crear el mapa, {}", err); 
@@ -62,10 +60,15 @@ fn main() -> Result<(), Box<dyn Error>> {
                 return Err(Box::new(std::io::Error::new(std::io::ErrorKind::Other, "Error al crear el mapa")));}
     };
     mapa.mostrar_mapa();
-    let bomba = mapa.obtener_celda(y as usize, x as usize);
+
+    let bomba = mapa.obtener_celda(y as usize, x as usize)
+                            .map_err(|err| format!("Error, no hayu na bomba {}", err))?;
     match bomba {
         Celda::Bomba { representacion: _, alcance, de_traspaso } => {
-            Explosion::new(*alcance as i32, *de_traspaso).iniciar_explosion(&mut mapa, y, x)
+            match Explosion::new(*alcance as i32, *de_traspaso).iniciar_explosion(&mut mapa, y, x) {
+                Ok(_) => {},
+                Err(_) => {return Err(Box::new(std::io::Error::new(std::io::ErrorKind::Other, "Error al crear la explosion")));}
+            }
         },
         _ => {
             guardar_error_y_salir("No hay una bomba en la posicion elegida", &file_path_destino)?; 
