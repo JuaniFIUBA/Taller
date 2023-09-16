@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["crear_objeto"],"struct":["Mapa"]};
