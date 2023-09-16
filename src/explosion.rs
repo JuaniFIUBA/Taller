@@ -2,13 +2,35 @@ use crate::Mapa;
 use crate::Celda;
 use crate::Enemigo;
 use std::error::Error;
+
+/// Simula una explosion 
+
 pub struct Explosion {
+    /// Alcance de la explosión
     alcance: i32,
+    
+    /// Indicador de si la explosión fue generada por una bomba de traspaso
     de_traspaso: bool,
+
+    /// Enemigos afectados por la explosión, se utiliza para no golpear dos veces al mismo enemigo con la misma explosión
     enemigos_afectados: Vec<Enemigo>
 }
 
 impl Explosion {
+    /// Crea una nueva instancia de Explosión, con alcance y característica de traspaso    
+    /// 
+    /// # Argumentos
+    ///
+    /// * `alcance`: representa el alcance que tendrá la explosión .
+    /// * `de_traspaso`: indica si la explosión traspasa o no ciertos objetos .
+    ///
+    /// # Ejemplo
+    ///
+    /// ```
+    /// use explosion::Explosion;
+    ///
+    /// let explosion = Explosion::new(3, true);
+    /// ```
     pub fn new(alcance: i32, de_traspaso: bool) -> Explosion {
         Explosion {
             alcance,
@@ -16,20 +38,59 @@ impl Explosion {
             enemigos_afectados: Vec::new()
         }
     }
+
+    /// Simula la explosión de una bomba en el lugar indicado, borra la posición inicial ya que 
+    /// es una bomba, luego "expande" la explosión hacia sus costados
+    /// El caso en el que no es una bomba está contemplado fuera de la explosión, entonces una precondición será
+    /// que el lugar indicado sea una bomba efectivamente.
+    /// 
+    /// # Argumentos
+    ///
+    /// * `mapa`: mapa sobre el cual se realizará la explosión .
+    /// * `fila`: fila sobre la cual se iniciara la explosión .
+    /// * `columna`: columna sobre la cual se iniciara la explosión .
+    ///
+    /// # Returns
+    /// Result vacio o error
+    /// 
+    /// # Ejemplo
+    ///
+    /// ``` ejemplo
+    /// use explosion::Explosion;
+    /// use mapa::Mapa;
+    /// let mapa = Mapa::new(vec![vec!['B1']]);
+    /// 
+    /// Explosion::new(3, true).iniciar_explosion(mapa, 0, 0);
+    /// ```
+
     pub fn iniciar_explosion(&mut self, mapa: &mut Mapa ,fila: i32, columna: i32) -> Result<(), Box<dyn Error>> {        
         mapa.borrar(fila as usize, columna as usize);
-        self.explotar_al_sur(mapa, fila, columna, self.alcance)?;
-        self.explotar_al_norte(mapa, fila, columna, self.alcance)?;
-        self.explotar_al_este(mapa, fila, columna, self.alcance)?;
-        self.explotar_al_oeste(mapa , fila, columna, self.alcance)?;
+        self.explotar_abajo(mapa, fila, columna, self.alcance)?;
+        self.explotar_arriba(mapa, fila, columna, self.alcance)?;
+        self.explotar_derecha(mapa, fila, columna, self.alcance)?;
+        self.explotar_izquierda(mapa , fila, columna, self.alcance)?;
         Ok(())
     }
 
-    fn explotar_al_sur(&mut self, mapa: &mut Mapa, fila: i32, columna: i32, alcance: i32) -> Result<(), Box<dyn Error>>{
+    /// Simula la expansión de una explosión hacia abajo del lugar de donde fué inciada.
+    /// 
+    /// # Argumentos 
+    /// 
+    /// * `mapa`: mapa sobre el cual se realiza la expansión
+    /// * `fila`: fila que indica el inicio de la explosión
+    /// * `columna`: columna que indica el inicio de la explosión
+    /// * `alcance`: alcance de la expansión 
+    /// 
+    /// # Returns
+    /// 
+    /// Result vacio o Error
+    
+
+    fn explotar_abajo(&mut self, mapa: &mut Mapa, fila: i32, columna: i32, alcance: i32) -> Result<(), Box<dyn Error>>{
         let mut fila_actual = fila as usize + 1;
         let mut cont: i32 = 1;
         while fila_actual < mapa.obtener_largo() && cont <= alcance{
-            if !self.actuar(mapa, fila_actual as usize, columna as usize, &mut cont)? {
+            if !self.explotar_celda(mapa, fila_actual as usize, columna as usize, &mut cont)? {
                 break;
             }
             cont += 1;
@@ -37,11 +98,24 @@ impl Explosion {
         }
         Ok(()) 
     }
-    fn explotar_al_norte(&mut self, mapa: &mut Mapa, fila: i32, columna: i32, alcance: i32) -> Result<(), Box<dyn Error>> {
+    /// Simula la expansión de una explosión hacia arriba del lugar de donde fué inciada.
+    /// 
+    /// # Argumentos 
+    /// 
+    /// * `mapa`: mapa sobre el cual se realiza la expansión
+    /// * `fila`: fila que indica el inicio de la explosión
+    /// * `columna`: columna que indica el inicio de la explosión
+    /// * `alcance`: alcance de la expansión 
+    /// 
+    /// # Returns
+    /// 
+    /// Result vacio o Error
+    
+    fn explotar_arriba(&mut self, mapa: &mut Mapa, fila: i32, columna: i32, alcance: i32) -> Result<(), Box<dyn Error>> {
         let mut fila_actual = fila - 1;
         let mut cont: i32 = 1; // Empieza en 1 porque estoy en el siguiente casillero de la expl
-        while fila_actual > 0 && cont  <= alcance{
-            if !self.actuar(mapa, fila_actual as usize, columna as usize, &mut cont)? {
+        while fila_actual >= 0 && cont  <= alcance{
+            if !self.explotar_celda(mapa, fila_actual as usize, columna as usize, &mut cont)? {
                 break;
             }
             cont += 1;
@@ -49,11 +123,25 @@ impl Explosion {
         }    
         Ok(()) 
     }
-    fn explotar_al_este(&mut self, mapa: &mut Mapa, fila: i32, columna: i32, alcance: i32) -> Result<(), Box<dyn Error>> {
+
+    /// Simula la expansión de una explosión hacia la derecha del lugar de donde fué inciada.
+    /// 
+    /// # Argumentos 
+    /// 
+    /// * `mapa`: mapa sobre el cual se realiza la expansión
+    /// * `fila`: fila que indica el inicio de la explosión
+    /// * `columna`: columna que indica el inicio de la explosión
+    /// * `alcance`: alcance de la expansión 
+    /// 
+    /// # Returns
+    /// 
+    /// Result vacio o Error
+    
+    fn explotar_derecha(&mut self, mapa: &mut Mapa, fila: i32, columna: i32, alcance: i32) -> Result<(), Box<dyn Error>> {
         let mut columna_actual = columna as usize + 1;
         let mut cont: i32 = 1;
         while columna_actual < mapa.obtener_largo() && cont <= alcance {
-            if !self.actuar(mapa, fila as usize, columna_actual as usize, &mut cont)? {
+            if !self.explotar_celda(mapa, fila as usize, columna_actual as usize, &mut cont)? {
                 break;
             }
             cont += 1;
@@ -61,11 +149,25 @@ impl Explosion {
         } 
         Ok(())
     } 
-    fn explotar_al_oeste(&mut self, mapa: &mut Mapa, fila: i32, columna: i32, alcance: i32) -> Result<(), Box<dyn Error>>{
+    
+    /// Simula la expansión de una explosión hacia la derecha del lugar de donde fué inciada.
+    /// 
+    /// # Argumentos 
+    /// 
+    /// * `mapa`: mapa sobre el cual se realiza la expansión
+    /// * `fila`: fila que indica el inicio de la explosión
+    /// * `columna`: columna que indica el inicio de la explosión
+    /// * `alcance`: alcance de la expansión 
+    /// 
+    /// # Returns
+    /// 
+    /// Result vacio o Error
+    
+    fn explotar_izquierda(&mut self, mapa: &mut Mapa, fila: i32, columna: i32, alcance: i32) -> Result<(), Box<dyn Error>>{
         let mut columna_actual= columna - 1;
         let mut cont: i32= 1;
-        while columna_actual > 0 && cont <= alcance{
-            if !self.actuar(mapa, fila as usize, columna_actual as usize, &mut cont)? {
+        while columna_actual >= 0 && cont <= alcance{
+            if !self.explotar_celda(mapa, fila as usize, columna_actual as usize, &mut cont)? {
                 break;
             }
             cont += 1;
@@ -74,7 +176,20 @@ impl Explosion {
         Ok(())
     }
 
-    fn actuar(&mut self, mapa: &mut Mapa, fila: usize, columna: usize, cont: &mut i32) -> Result<bool, Box<dyn std::error::Error>> {
+    /// "Explota" la celda indicada 
+    /// 
+    /// # Argumentos 
+    /// 
+    /// * `mapa`: mapa sobre el cual se realiza la explosión
+    /// * `fila`: fila en la que se va a explotar la celda
+    /// * `columna`: columna en la que se va a explotar la celda
+    /// * `cont`: contador actual para saber el ciclo de la explosión, se utiliza en el caso en el que haya un desvío y necesite recalcularse el alcance 
+    /// # Returns 
+    /// 
+    /// Result que puede ser booleano o Error. En el caso del booleano se interpreta como que la explosión "puede seguir" con su trayecto
+    /// Esto es porque en el caso en el que haya un objeto no traspasable, como una pared o un desvío, deberá parar la ejecución del ciclo invocante
+
+    fn explotar_celda(&mut self, mapa: &mut Mapa, fila: usize, columna: usize, cont: &mut i32) -> Result<bool, Box<dyn std::error::Error>> {
         let objeto = mapa.obtener_celda(fila, columna).map_err(|err| format!("Error al obtener la celda {}", err))?;
         match objeto {
             Celda::Vacio { representacion: _ } => {Ok(true)},
@@ -98,14 +213,114 @@ impl Explosion {
                 Ok(true)},
             Celda::Desvio { representacion: _, direccion } => {
                 match direccion {
-                    'U' => {self.explotar_al_norte(mapa, fila as i32, columna as i32, self.alcance - *cont)?;},
-                    'D' => {self.explotar_al_sur(mapa, fila as i32, columna as i32, self.alcance - *cont)?;},
-                    'R' => {self.explotar_al_este(mapa, fila as i32, columna as i32, self.alcance - *cont)?;},
-                    'L' => {self.explotar_al_oeste(mapa, fila as i32, columna as i32, self.alcance - *cont)?;},
+                    'U' => {self.explotar_arriba(mapa, fila as i32, columna as i32, self.alcance - *cont)?;},
+                    'D' => {self.explotar_abajo(mapa, fila as i32, columna as i32, self.alcance - *cont)?;},
+                    'R' => {self.explotar_derecha(mapa, fila as i32, columna as i32, self.alcance - *cont)?;},
+                    'L' => {self.explotar_izquierda(mapa, fila as i32, columna as i32, self.alcance - *cont)?;},
                     _ => {return Err(Box::new(std::io::Error::new(std::io::ErrorKind::Other, "Error al obtener la direccion del desvio")));}
                 }
                 Ok(false)
             }
         }
     }
+}
+
+
+#[cfg(test)]
+
+mod test {
+    use super::*;
+    // fn enemigo(pv: usize) -> Enemigo {
+    //     Enemigo::new('F', pv, 0)
+    // }
+    fn mapa_3_x_3 () -> Mapa {
+        let enemigo = Celda::Enemigo { enemigo: Enemigo::new('F', 1, 0)  };
+        let vacio = Celda::Vacio { representacion: '_' };
+        let bomba = Celda::Bomba { representacion: 'B', alcance: 1, de_traspaso: false };
+
+        Mapa::new(vec![
+            vec![vacio.clone(), enemigo.clone(), vacio.clone()],
+            vec![enemigo.clone(), bomba.clone(), enemigo.clone()],
+            vec![vacio.clone(), enemigo.clone(), vacio.clone()]
+            ])
+    }
+    fn mapa_3_x_3_con_obstaculos() -> Mapa {
+        let enemigo = Celda::Enemigo { enemigo: Enemigo::new('F', 1, 0)  };
+        let vacio = Celda::Vacio { representacion: '_' };
+        let bomba = Celda::Bomba { representacion: 'S', alcance: 3, de_traspaso: false };
+        let roca = Celda::Obstaculo { representacion: 'R' };
+        let pared = Celda::Obstaculo { representacion: 'W' };
+
+        Mapa::new(vec![
+            vec![bomba.clone(), roca.clone(), enemigo.clone()],
+            vec![bomba.clone(), pared.clone(), enemigo.clone()],
+            vec![vacio.clone(), vacio.clone(), vacio.clone()]
+            ])
+    }
+    fn mapa_3_x_3_con_desvios() -> Mapa {
+        let enemigo = Celda::Enemigo { enemigo: Enemigo::new('F', 2, 0)  };
+        let vacio = Celda::Vacio { representacion: '_' };
+        let bomba = Celda::Bomba { representacion: 'S', alcance: 3, de_traspaso: false };
+        let desvio_izquierda = Celda::Desvio { representacion: 'D', direccion: 'L' };
+
+        Mapa::new(vec![
+            vec![bomba.clone(), enemigo.clone(), desvio_izquierda.clone()],
+            vec![vacio.clone(), vacio.clone(), vacio.clone()],
+            vec![vacio.clone(), vacio.clone(), vacio.clone()]
+            ])
+    }
+    #[test]
+    fn test_explotar_arriba() -> Result<(), Box<dyn Error>> {
+        let mut mapa: Mapa = mapa_3_x_3();
+        let mut expl = Explosion::new(1, false);
+        expl.explotar_arriba(&mut mapa, 1, 1, 1)?;
+        assert_eq!(mapa.obtener_celda(0, 1)?, &mut Celda::Vacio { representacion: '_' });
+        Ok(())
+    }
+    #[test]
+    fn test_explotar_abajo() -> Result<(), Box<dyn Error>> {
+        let mut mapa: Mapa = mapa_3_x_3();
+        let mut expl = Explosion::new(1, false);
+        expl.explotar_abajo(&mut mapa, 1, 1, 1)?;
+        assert_eq!(mapa.obtener_celda(2, 1)?, &mut Celda::Vacio { representacion: '_' });
+        Ok(())
+    }
+    #[test]
+    fn test_explotar_izquierda() -> Result<(), Box<dyn Error>> {
+        let mut mapa: Mapa = mapa_3_x_3();
+        let mut expl = Explosion::new(1, false);
+        expl.explotar_izquierda(&mut mapa, 1, 1, 1)?;
+        assert_eq!(mapa.obtener_celda(1, 0)?, &mut Celda::Vacio { representacion: '_' });
+        Ok(())
+    }
+    #[test]
+    fn test_explotar_derecha() -> Result<(), Box<dyn Error>> {
+        let mut mapa: Mapa = mapa_3_x_3();
+        let mut expl = Explosion::new(1, false);
+        expl.explotar_derecha(&mut mapa, 1, 1, 1)?;
+        assert_eq!(mapa.obtener_celda(1, 2)?, &mut Celda::Vacio { representacion: '_' });
+        Ok(())
+    }
+    #[test]
+    fn  test_explosion_de_traspaso_traspasa_rocas() -> Result<(), Box<dyn Error>> {
+        let mut mapa = mapa_3_x_3_con_obstaculos();
+        let mut expl = Explosion::new(3, true);
+        expl.iniciar_explosion(&mut mapa, 0, 0)?;
+        assert_eq!(mapa.obtener_celda(0, 2)?, &mut Celda::Vacio { representacion: '_' });
+        assert_eq!(mapa.obtener_celda(1, 2)?, &mut Celda::Enemigo { enemigo: Enemigo::new('F', 1, 0) });        
+        Ok(())
+    }
+    #[test]
+    fn test_misma_explosion_no_golpea_dos_veces_al_enemigo() -> Result<(), Box<dyn Error>> {
+        let mut mapa = mapa_3_x_3_con_desvios();
+        let mut expl = Explosion::new(3, false);
+        expl.iniciar_explosion(&mut mapa, 0, 0)?;
+        let enemigo = mapa.obtener_celda(0, 1)?;
+        match enemigo {
+            Celda::Enemigo { enemigo } => assert!(enemigo.esta_vivo()),
+            _ => {assert!(false)} 
+        }
+        Ok(())
+    }
+
 }

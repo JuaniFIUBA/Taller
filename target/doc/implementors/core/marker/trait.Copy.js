@@ -1,0 +1,3 @@
+(function() {var implementors = {
+"TP_Taller_Definitivo":[["impl <a class=\"trait\" href=\"https://doc.rust-lang.org/1.71.1/core/marker/trait.Copy.html\" title=\"trait core::marker::Copy\">Copy</a> for <a class=\"struct\" href=\"TP_Taller_Definitivo/enemigo/struct.Enemigo.html\" title=\"struct TP_Taller_Definitivo::enemigo::Enemigo\">Enemigo</a>"]]
+};if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()
