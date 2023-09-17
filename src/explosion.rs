@@ -127,6 +127,7 @@ impl Explosion {
     }
     
     // cont se utiliza para indicar cuantas iteraciones realizó para una determinada dirección 
+    // el valor de retorno bool responde la pregunta de si la explosion deberia seguir o no
     fn explotar_celda(&mut self, mapa: &mut Mapa, fila: usize, columna: usize, cont: &mut i32) -> Result<bool, Box<dyn std::error::Error>> {
         let objeto = mapa.obtener_celda(fila, columna).map_err(|err| format!("Error al obtener la celda {}", err))?;
         match objeto {
@@ -136,11 +137,11 @@ impl Explosion {
                 Ok(false)
             }
             Celda::Obstaculo { representacion } => {
-                match representacion {
-                    'W' => {Ok(false)},
-                    'R' => {if self.de_traspaso {Ok(true)} else{Ok(false)}}
-                    _ => {Ok(false)}
-                }                
+                if *representacion == 'W' {
+                    Ok(false)
+                } else {
+                    if self.de_traspaso {Ok(true)} else{Ok(false)}
+                }             
             }
             Celda::Enemigo { enemigo } => {
                 if !self.enemigos_afectados.contains(enemigo){

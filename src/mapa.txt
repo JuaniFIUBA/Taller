@@ -1,4 +1,4 @@
-S9 _ R F1
-W F1 F2 _
+_ R R F1
+B1 F1 S4 _
 F1 _ _ _
-DR F1 _ _
+DR F1 _ B2

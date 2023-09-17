@@ -54,11 +54,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         Ok(bomba) => { //
             match bomba {
                 Celda::Bomba { representacion: _, alcance, de_traspaso } => {
-                    match Explosion::new(*alcance as i32, *de_traspaso).iniciar_explosion(&mut mapa, y, x) {
-                        Ok(_) => {},
-                        Err(_) => {return Err(Box::new(std::io::Error::new(std::io::ErrorKind::Other, "Error al crear la explosion")));}
-                    }
-                },
+                    Explosion::new(*alcance as i32, *de_traspaso).iniciar_explosion(&mut mapa, y, x)?;},
                 _ => {
                     guardar_error_y_salir("No hay una bomba en la posicion elegida", &file_path_destino)?; 
                     return Err(Box::new(std::io::Error::new(std::io::ErrorKind::Other, "No hay una bomba en la posicion elegida")));

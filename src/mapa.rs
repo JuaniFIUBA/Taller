@@ -155,26 +155,26 @@ impl Mapa {
 // atributos, rust compara 1 a 1 esos atributos y devuelve true en caso de que coincidan, que no es lo
 // que esta bien, ya que podrian tener los mismos puntos de vida y no ser el mismo enemigo
 fn crear_objeto(palabra: &str, cant_enemigos: &mut u32) -> Result<Celda, Box<dyn std::error::Error>> {
-    let obj = palabra.chars().next().ok_or("La cadena esta vacia")?;
+    // let obj = palabra.chars().next().ok_or("La cadena esta vacia")?;
+    let (repr, atrib) = palabra.split_at(1); 
+    let obj = repr.chars().next().ok_or("Error al objener la representacion")?;
     match obj {
         '_' => {Ok(Celda::Vacio { representacion: '_' })},
         'B' | 'S' => {
-            let alcance = palabra.chars().nth(1).ok_or("Formato de bomba inválido")?;
-            let valor_alcance = alcance.to_digit(10).ok_or("Fallo al convertir el alcance a entero")?;
-            if obj == 'B' {Ok(Celda::Bomba { representacion: obj, alcance: valor_alcance as usize, de_traspaso: false })}
-            else {Ok(Celda::Bomba { representacion: obj, alcance: valor_alcance as usize, de_traspaso: true })}
+            let alcance = atrib.parse::<usize>()?;
+            if obj == 'B' {Ok(Celda::Bomba { representacion: obj, alcance: alcance, de_traspaso: false })}
+                else {Ok(Celda::Bomba { representacion: obj, alcance: alcance, de_traspaso: true })}
         }
         'R' | 'W' => {  
             Ok(Celda::Obstaculo { representacion: obj })
         },
         'F' => {
-            let pv = palabra.chars().nth(1).ok_or("Puntos de vida inválidos")?;
-            let valor_pv = pv.to_digit(10).ok_or("Fallo al convertir el alcance a entero")?;
+            let pv = atrib.parse::<usize>()?;
             *cant_enemigos += 1;
-            Ok(Celda::Enemigo { enemigo: Enemigo::new(obj, valor_pv as  usize, *cant_enemigos)})
+            Ok(Celda::Enemigo { enemigo: Enemigo::new(obj, pv, *cant_enemigos)})
         },
         'D' => {
-            let dir = palabra.chars().nth(1).ok_or("Dirección de desvío inválida")?;
+            let dir = atrib.chars().next().ok_or("Dirección de desvío inválida")?;
             Ok(Celda::Desvio { representacion: obj, direccion: dir })
         },
         _ => {Err(Box::new(std::io::Error::new(std::io::ErrorKind::Other, "Objeto no reconocido")))} // aca va error
