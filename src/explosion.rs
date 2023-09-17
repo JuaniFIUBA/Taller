@@ -39,6 +39,48 @@ impl Explosion {
         }
     }
 
+    /// Obtiene la celda indicada en el mapa indicado y luego, en caso de que haya una bomba, en base a sus atributos inicia una explosión
+    /// 
+    /// # Argumentos
+    ///
+    /// * `file_path_destino`: directorio sobre el cual se creará el archivo y se escribirá el error en caso de que haya uno.
+    /// * `mapa`: mapa sobre el cual se realizará la explosión.
+    /// * `x`: columna sobre la cual se iniciara la explosión.
+    /// * `y`: fila sobre la cual se iniciara la explosión .
+    ///
+    /// # Returns
+    /// Result vacio o error
+    /// 
+    /// # Ejemplo
+    ///
+    /// ``` ejemplo
+    /// use explosion::Explosion;
+    /// use mapa::Mapa;
+    /// let mapa = Mapa::new(vec![vec!['B1']]);
+    /// let file_path = "/home/usr/carpeta";
+    /// 
+    /// Explosion::iniciar_explosion(&file_path, mapa, 0, 0)?;
+    /// ```
+
+    pub fn explotar(file_path_destino: &str, mapa: &mut Mapa, x: i32, y: i32) -> Result<(), Box<dyn Error>> { 
+        match mapa.obtener_celda(y as usize, x as usize).map_err(|err| format!("{}", err)) {
+            Ok(bomba) => { //
+                match bomba {
+                    Celda::Bomba { representacion: _, alcance, de_traspaso } => {
+                        Explosion::new(*alcance as i32, *de_traspaso).iniciar_explosion(mapa, y, x)?;},
+                    _ => {
+                        io::guardar_error_y_salir("No hay una bomba en la posicion elegida", file_path_destino)?; 
+                        return Err(Box::new(std::io::Error::new(std::io::ErrorKind::Other, "No hay una bomba en la posicion elegida")));
+                    }
+                }
+            
+            },
+            Err(err) => {
+                io::guardar_error_y_salir(&err, file_path_destino)?;
+                return Err(Box::new(std::io::Error::new(std::io::ErrorKind::Other, err)));}
+        }
+        Ok(())
+    }
     /// Simula la explosión de una bomba en el lugar indicado, borra la posición inicial ya que 
     /// es una bomba, luego "expande" la explosión hacia sus costados
     /// El caso en el que no es una bomba está contemplado fuera de la explosión, entonces una precondición será
@@ -62,26 +104,6 @@ impl Explosion {
     /// 
     /// Explosion::new(3, true).iniciar_explosion(mapa, 0, 0);
     /// ```
-
-    pub fn explotar(file_path_destino: &str, mapa: &mut Mapa, x: i32, y: i32) -> Result<(), Box<dyn Error>> { 
-        match mapa.obtener_celda(y as usize, x as usize).map_err(|err| format!("{}", err)) {
-            Ok(bomba) => { //
-                match bomba {
-                    Celda::Bomba { representacion: _, alcance, de_traspaso } => {
-                        Explosion::new(*alcance as i32, *de_traspaso).iniciar_explosion(mapa, y, x)?;},
-                    _ => {
-                        io::guardar_error_y_salir("No hay una bomba en la posicion elegida", file_path_destino)?; 
-                        return Err(Box::new(std::io::Error::new(std::io::ErrorKind::Other, "No hay una bomba en la posicion elegida")));
-                    }
-                }
-            
-            },
-            Err(err) => {
-                io::guardar_error_y_salir(&err, file_path_destino)?;
-                return Err(Box::new(std::io::Error::new(std::io::ErrorKind::Other, err)));}
-        }
-        Ok(())
-    }
 
     fn iniciar_explosion(&mut self, mapa: &mut Mapa ,fila: i32, columna: i32) -> Result<(), Box<dyn Error>> {        
         mapa.borrar(fila as usize, columna as usize);
