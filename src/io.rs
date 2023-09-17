@@ -3,7 +3,9 @@ use std::io::Write;
 use std::error::Error;
 use std::env;
 
-// el resultado tiene en 0 el file path origen y en 1 el file path destino
+/// Obtiene de los argumentos pasados los file paths destino y origen, junto con las coordenadas
+/// En caso de error escribe en el directorio indicado por file_path_origen, en el caso de que no se pueda, lanza un error 
+    
 pub fn obtener_input() -> Result<(String, String, i32, i32), Box<dyn Error>> {
     let args: Vec<String> = env::args().collect();
     if args.len() != 5 {
@@ -17,7 +19,18 @@ pub fn obtener_input() -> Result<(String, String, i32, i32), Box<dyn Error>> {
     Ok((file_path_origen, file_path_destino, x, y))
 }  
 
-
+/// Guarda un mensaje de error en un archivo cuyo nombre coincide con el archivo input, pero puede ser escrito en otro directorio
+/// indicado en file_path_destino
+/// 
+/// # Argumentos 
+///* `mensaje`: mensaje de error.
+///* `file_path_destino`: directorio en el cual se guardara el mensaje de error.
+/// 
+/// # Returns 
+/// Error en caso de que no se haya podido escribir.
+/// 
+/// No se vuelve a llamar a la funcion guardar_error_y_salir en caso de que no se haya podido escribir para evitar una posible 
+/// recursion infinita.
 pub fn guardar_error_y_salir(mensaje: &str, file_path_destino: &str) -> Result<(), Box<dyn Error>> {
     let mut archivo = File::create(file_path_destino)?;
     let mensaje_formateado = format!("ERROR: [{}]", mensaje);

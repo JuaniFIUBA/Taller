@@ -158,8 +158,9 @@ impl Explosion {
             }
             Celda::Obstaculo { representacion } => {
                 if *representacion == 'W' {
-                    Ok(false)
-                } else if self.de_traspaso {Ok(true)} else {Ok(false)}             
+                    Ok(false)                                           
+                } else if self.de_traspaso && *representacion == 'R' {Ok(true)} 
+                else {Ok(false)}  // check en caso de que traspase y se trate de una roca           
             }
             Celda::Enemigo { enemigo } => {
                 if !self.enemigos_afectados.contains(enemigo){

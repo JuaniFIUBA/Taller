@@ -1,5 +1,3 @@
-use std::error::Error;
-
 mod celda;
 use celda::Celda;
 mod mapa;
@@ -10,7 +8,7 @@ use explosion::Explosion;
 mod enemigo;
 use enemigo::Enemigo;
 
-fn main() -> Result<(), Box<dyn Error>> {
+fn main() -> Result<(), Box<dyn std::error::Error>> {
     let (file_path_origen, file_path_destino, x, y) = io::obtener_input()?;
 
     let mut mapa = match Mapa::crear_mapa(&file_path_origen).map_err(|err| format!("Error al crear el mapa. {}", err)) {
