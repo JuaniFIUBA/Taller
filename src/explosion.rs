@@ -154,13 +154,12 @@ impl Explosion {
             Celda::Vacio { representacion: _ } => {Ok(true)},
             Celda::Bomba { representacion: _, alcance, de_traspaso } => {
                 Explosion::new(*alcance as i32, *de_traspaso).iniciar_explosion(mapa, fila as i32, columna as i32)?;
-                Ok(false)
+                Ok(true)
             }
             Celda::Obstaculo { representacion } => {
                 if *representacion == 'W' {
                     Ok(false)                                           
-                } else if self.de_traspaso && *representacion == 'R' {Ok(true)} 
-                else {Ok(false)}  // check en caso de que traspase y se trate de una roca           
+                } else if self.de_traspaso && *representacion == 'R' {Ok(true)} else {Ok(false)}  // check en caso de que traspase y se trate de una roca           
             }
             Celda::Enemigo { enemigo } => {
                 if !self.enemigos_afectados.contains(enemigo){
@@ -176,8 +175,7 @@ impl Explosion {
                     'R' => {self.explotar_derecha(mapa, fila as i32, columna as i32, self.alcance - *cont)?;},
                     'L' => {self.explotar_izquierda(mapa, fila as i32, columna as i32, self.alcance - *cont)?;},
                     _ => {return Err(Box::new(std::io::Error::new(std::io::ErrorKind::Other, "Error al obtener la direccion del desvio")));}
-                }
-                Ok(false)
+                } Ok(false)
             }
         }
     }
