@@ -81,30 +81,10 @@ impl Explosion {
         }
         Ok(())
     }
-    /// Simula la explosión de una bomba en el lugar indicado, borra la posición inicial ya que 
-    /// es una bomba, luego "expande" la explosión hacia sus costados
-    /// El caso en el que no es una bomba está contemplado fuera de la explosión, entonces una precondición será
-    /// que el lugar indicado sea una bomba efectivamente.
-    /// 
-    /// # Argumentos
-    ///
-    /// * `mapa`: mapa sobre el cual se realizará la explosión .
-    /// * `fila`: fila sobre la cual se iniciara la explosión .
-    /// * `columna`: columna sobre la cual se iniciara la explosión .
-    ///
-    /// # Returns
-    /// Result vacio o error
-    /// 
-    /// # Ejemplo
-    ///
-    /// ``` ejemplo
-    /// use explosion::Explosion;
-    /// use mapa::Mapa;
-    /// let mapa = Mapa::new(vec![vec!['B1']]);
-    /// 
-    /// Explosion::new(3, true).iniciar_explosion(mapa, 0, 0);
-    /// ```
 
+    // Precondicion: en el lugar hay una bomba
+    // borra la celda para que en caso de que se detone otra bomba, la explosion no la haga volver a explotar y generar recursion infinita.
+    // Luego llama a 4 funciones que iteran hacia las 4 direcciones posibles, detonando las celdas correspondientes al alcance  
     fn iniciar_explosion(&mut self, mapa: &mut Mapa ,fila: i32, columna: i32) -> Result<(), Box<dyn Error>> {        
         mapa.borrar(fila as usize, columna as usize);
         self.explotar_abajo(mapa, fila, columna, self.alcance)?;
