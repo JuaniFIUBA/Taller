@@ -1,8 +1,8 @@
 use crate::Mapa;
 use crate::Celda;
 use crate::Enemigo;
+use crate::io;
 use std::error::Error;
-use super::*;
 /// Simula una explosion 
 
 pub struct Explosion {
@@ -70,14 +70,14 @@ impl Explosion {
                     Celda::Bomba { representacion: _, alcance, de_traspaso } => {
                         Explosion::new(*alcance as i32, *de_traspaso).iniciar_explosion(mapa, y, x)?;},
                     _ => {
-                        guardar_error_y_salir("No hay una bomba en la posicion elegida", file_path_destino)?; 
+                        io::guardar_error_y_salir("No hay una bomba en la posicion elegida", file_path_destino)?; 
                         return Err(Box::new(std::io::Error::new(std::io::ErrorKind::Other, "No hay una bomba en la posicion elegida")));
                     }
                 }
             
             },
             Err(err) => {
-                guardar_error_y_salir(&err, file_path_destino)?;
+                io::guardar_error_y_salir(&err, file_path_destino)?;
                 return Err(Box::new(std::io::Error::new(std::io::ErrorKind::Other, err)));}
         }
         Ok(())
@@ -159,7 +159,7 @@ impl Explosion {
             Celda::Obstaculo { representacion } => {
                 if *representacion == 'W' {
                     Ok(false)
-                } else {if self.de_traspaso {Ok(true)} else {Ok(false)}}             
+                } else if self.de_traspaso {Ok(true)} else {Ok(false)}             
             }
             Celda::Enemigo { enemigo } => {
                 if !self.enemigos_afectados.contains(enemigo){
