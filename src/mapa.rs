@@ -162,8 +162,8 @@ fn crear_objeto(palabra: &str, cant_enemigos: &mut u32) -> Result<Celda, Box<dyn
         '_' => {Ok(Celda::Vacio { representacion: '_' })},
         'B' | 'S' => {
             let alcance = atrib.parse::<usize>()?;
-            if obj == 'B' {Ok(Celda::Bomba { representacion: obj, alcance: alcance, de_traspaso: false })}
-                else {Ok(Celda::Bomba { representacion: obj, alcance: alcance, de_traspaso: true })}
+            if obj == 'B' {Ok(Celda::Bomba { representacion: obj, alcance, de_traspaso: false })}
+                else {Ok(Celda::Bomba { representacion: obj, alcance, de_traspaso: true })}
         }
         'R' | 'W' => {  
             Ok(Celda::Obstaculo { representacion: obj })

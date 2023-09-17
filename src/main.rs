@@ -3,7 +3,6 @@ use std::io::Write;
 use std::error::Error;
 use std::env;
 
-
 mod celda;
 use celda::Celda;
 mod mapa;
@@ -12,27 +11,6 @@ mod explosion;
 use explosion::Explosion;
 mod enemigo;
 use enemigo::Enemigo;
-
-
-// guarda el error mensaje de error en el archivo destino indicado por file_path_destino y retorna
-fn guardar_error_y_salir(mensaje: &str, file_path_destino: &str) -> Result<(), Box<dyn Error>> {
-    let mut archivo = File::create(file_path_destino)?;
-    let mensaje_formateado = format!("ERROR: [{}]", mensaje);
-    archivo.write_all(mensaje_formateado.as_bytes())?; // No tiene sentido tratar de escribir este error si el anterior no se pudo escribir
-    Ok(())
-}
-
-
-// pasa una coordenada numerica en formato de &str a i32 
-fn formatear_coordenada(argumento: &str, file_path_destino: &str) -> Result<i32, Box::<dyn Error>>{
-    match argumento.parse::<i32>().map_err(|err| format!("Error al parsear {} a i32, {}", argumento, err)) {
-        Ok(x) => Ok(x),
-        Err(err) => {
-            guardar_error_y_salir(&err, file_path_destino)?;
-            Err(Box::new(std::io::Error::new(std::io::ErrorKind::Other, err)))
-        }
-    }
-}
 
 fn main() -> Result<(), Box<dyn Error>> {
     let args: Vec<String> = env::args().collect();
@@ -50,22 +28,28 @@ fn main() -> Result<(), Box<dyn Error>> {
                 return Err(Box::new(std::io::Error::new(std::io::ErrorKind::Other, err)));}
     };
     mapa.mostrar_mapa();      
-    match mapa.obtener_celda(y as usize, x as usize).map_err(|err| format!("{}", err)) {
-        Ok(bomba) => { //
-            match bomba {
-                Celda::Bomba { representacion: _, alcance, de_traspaso } => {
-                    Explosion::new(*alcance as i32, *de_traspaso).iniciar_explosion(&mut mapa, y, x)?;},
-                _ => {
-                    guardar_error_y_salir("No hay una bomba en la posicion elegida", &file_path_destino)?; 
-                    return Err(Box::new(std::io::Error::new(std::io::ErrorKind::Other, "No hay una bomba en la posicion elegida")));
-                }
-            }
-        
-        },
-        Err(err) => {
-            guardar_error_y_salir(&err, &file_path_destino)?;
-            return Err(Box::new(std::io::Error::new(std::io::ErrorKind::Other, err)));}
-    }
+    Explosion::explotar(&file_path_destino, &mut mapa, x, y)?;
     mapa.guardar_mapa(&file_path_destino)?;
     Ok(())
+}
+
+
+// guarda el error mensaje de error en el archivo destino indicado por file_path_destino y retorna
+pub fn guardar_error_y_salir(mensaje: &str, file_path_destino: &str) -> Result<(), Box<dyn Error>> {
+    let mut archivo = File::create(file_path_destino)?;
+    let mensaje_formateado = format!("ERROR: [{}]", mensaje);
+    archivo.write_all(mensaje_formateado.as_bytes())?; // No tiene sentido tratar de escribir este error si el anterior no se pudo escribir
+    Ok(())
+}
+
+
+// pasa una coordenada numerica en formato de &str a i32 
+fn formatear_coordenada(argumento: &str, file_path_destino: &str) -> Result<i32, Box::<dyn Error>>{
+    match argumento.parse::<i32>().map_err(|err| format!("Error al parsear {} a i32, {}", argumento, err)) {
+        Ok(x) => Ok(x),
+        Err(err) => {
+            guardar_error_y_salir(&err, file_path_destino)?;
+            Err(Box::new(std::io::Error::new(std::io::ErrorKind::Other, err)))
+        }
+    }
 }
