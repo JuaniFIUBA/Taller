@@ -3,8 +3,9 @@ use std::io::Write;
 use std::error::Error;
 use std::env;
 
-/// Obtiene de los argumentos pasados los file paths destino y origen, junto con las coordenadas
-/// En caso de error escribe en el directorio indicado por file_path_origen, en el caso de que no se pueda, lanza un error 
+/// Obtiene de los argumentos y devuelve los file paths destino y origen, junto con las coordenadas, si la cantidad de argumentos es
+/// menor a 5, retorna un error. En caso de error al convertir las coordenadas, escribe en el directorio indicado por
+///  file_path_origen, en el caso de que no se pueda, lanza un error 
     
 pub fn obtener_input() -> Result<(String, String, i32, i32), Box<dyn Error>> {
     let args: Vec<String> = env::args().collect();

@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"fn":["formatear_input","guardar_error_y_salir","main"],"mod":["celda","enemigo","explosion","mapa"]};

@@ -1,1 +1,1 @@
-window.ALL_CRATES = ["TP_Taller_Definitivo"];
+window.ALL_CRATES = ["TP_Taller_Definitivo","tp_individual"];
