@@ -12,7 +12,8 @@ pub struct Mapa {
 
 
 impl Mapa {    
-    /// Dada una grilla crea una instancia de Mapa
+    #[cfg(test)]
+    /// Dada una grilla crea una instanc}ia de Mapa
     pub fn new(grilla: Vec<Vec<Celda>>) -> Mapa {
         Mapa { grilla }
     }
@@ -99,13 +100,13 @@ impl Mapa {
         }
     }
 
-    /// Muestra el mapa en consola&mut
+    /// Muestra el mapa en consola
     pub fn mostrar_mapa(&self) {
         for fila in &self.grilla {
             for columna in fila {
                 print!(" {}", columna.obtener_representacion());
             }
-            println!("");
+            println!();
         }
     }
 
@@ -148,31 +149,13 @@ impl Mapa {
     }
 }
 
-
-/// Funcion para poder obtener una celda dado un string.
-/// 
-/// # Argumentos 
-/// 
-/// * `palabra`: referencia a una cadena que contiene la representacion del objeto que será contenido en la celda
-/// * `cant_enemigos`: referencia mutable a un contador que sirve para asignarles un id a los enemigos y que sean distinguibles
-///  
-/// # Returns 
-/// 
-/// Result con la celda y su contenido correspondiente o error en caso de que no se reconozca el objeto
-/// 
-/// # Ejemplo
-/// 
-/// ``` texto   
-/// use celda::Celda;
-/// use mapa;
-/// 
-/// let bomba: Celda::Bomba = mapa::crear_objeto('B1', 0)?;
-/// assert_eq!(bomba, Celda::Bomba { representacion: 'B', alcance: 1, de_traspaso: false} );
-/// ```
-
-
+// Crea un tipo de dato perteneciente al enum Celda a partir de un string. 
+// El argumento cant_enemigos se utiliza para asignarle un id en caso de que se quiera crear un enemigo.
+// Esto se debe a que cuando se quiere comparar entre un enemigo y otro que por ejemplo tienen los mismos
+// atributos, rust compara 1 a 1 esos atributos y devuelve true en caso de que coincidan, que no es lo
+// que esta bien, ya que podrian tener los mismos puntos de vida y no ser el mismo enemigo
 fn crear_objeto(palabra: &str, cant_enemigos: &mut u32) -> Result<Celda, Box<dyn std::error::Error>> {
-    let obj = palabra.chars().nth(0).ok_or("La cadena esta vacia")?;
+    let obj = palabra.chars().next().ok_or("La cadena esta vacia")?;
     match obj {
         '_' => {Ok(Celda::Vacio { representacion: '_' })},
         'B' | 'S' => {
@@ -216,31 +199,4 @@ mod test {
         assert_eq!(mapa.obtener_celda(0, 0)?, &mut Celda::Vacio { representacion: '_' });        
         Ok(())
     }
-
-    // #[test]
-    // fn crea_vacio() -> Result<(), Box<dyn std::error::Error>>{
-    //     assert_eq!(Celda::Vacio { representacion: '_' }, crear_objeto(&'_'.to_string(), &mut 0)?);
-    //     Ok(())
-    // }
-    // #[test]
-    // fn crea_bomba() -> Result<(), Box<dyn std::error::Error>>{
-    //     let bomba = Celda::Bomba { representacion: 'B', alcance: 1, de_traspaso: false };
-    //     assert_eq!(bomba , crear_objeto(&"B1".to_string(), &mut 0)?);
-    //     Ok(())
-    // }
-    //#[test]
-    // fn crea_vacio() -> Result<(), Box<dyn std::error::Error>>{
-    //     assert_eq!(Celda::Vacio { representacion: '_' }, crear_objeto(&'_'.to_string(), &mut 0)?);
-    //     Ok(())
-    // }
-    // #[test]
-    // fn crea_vacio() -> Result<(), Box<dyn std::error::Error>>{
-    //     assert_eq!(Celda::Vacio { representacion: '_' }, crear_objeto(&'_'.to_string(), &mut 0)?);
-    //     Ok(())
-    // }
-    //   #[test]
-    // fn crea_vacio() -> Result<(), Box<dyn std::error::Error>>{
-    //     assert_eq!(Celda::Vacio { representacion: '_' }, crear_objeto(&'_'.to_string(), &mut 0)?);
-    //     Ok(())
-    // }
 }

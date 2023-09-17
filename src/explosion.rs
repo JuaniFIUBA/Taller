@@ -72,25 +72,13 @@ impl Explosion {
         Ok(())
     }
 
-    /// Simula la expansión de una explosión hacia abajo del lugar de donde fué inciada.
-    /// 
-    /// # Argumentos 
-    /// 
-    /// * `mapa`: mapa sobre el cual se realiza la expansión
-    /// * `fila`: fila que indica el inicio de la explosión
-    /// * `columna`: columna que indica el inicio de la explosión
-    /// * `alcance`: alcance de la expansión 
-    /// 
-    /// # Returns
-    /// 
-    /// Result vacio o Error
-    
-
+    // Itera hacia abajo del mapa y "explota" las celdas encontradas, lo mismo para las explposiones 
+    // hacia otros lados
     fn explotar_abajo(&mut self, mapa: &mut Mapa, fila: i32, columna: i32, alcance: i32) -> Result<(), Box<dyn Error>>{
         let mut fila_actual = fila as usize + 1;
         let mut cont: i32 = 1;
         while fila_actual < mapa.obtener_largo() && cont <= alcance{
-            if !self.explotar_celda(mapa, fila_actual as usize, columna as usize, &mut cont)? {
+            if !self.explotar_celda(mapa, fila_actual, columna as usize, &mut cont)? {
                 break;
             }
             cont += 1;
@@ -98,18 +86,6 @@ impl Explosion {
         }
         Ok(()) 
     }
-    /// Simula la expansión de una explosión hacia arriba del lugar de donde fué inciada.
-    /// 
-    /// # Argumentos 
-    /// 
-    /// * `mapa`: mapa sobre el cual se realiza la expansión
-    /// * `fila`: fila que indica el inicio de la explosión
-    /// * `columna`: columna que indica el inicio de la explosión
-    /// * `alcance`: alcance de la expansión 
-    /// 
-    /// # Returns
-    /// 
-    /// Result vacio o Error
     
     fn explotar_arriba(&mut self, mapa: &mut Mapa, fila: i32, columna: i32, alcance: i32) -> Result<(), Box<dyn Error>> {
         let mut fila_actual = fila - 1;
@@ -123,25 +99,12 @@ impl Explosion {
         }    
         Ok(()) 
     }
-
-    /// Simula la expansión de una explosión hacia la derecha del lugar de donde fué inciada.
-    /// 
-    /// # Argumentos 
-    /// 
-    /// * `mapa`: mapa sobre el cual se realiza la expansión
-    /// * `fila`: fila que indica el inicio de la explosión
-    /// * `columna`: columna que indica el inicio de la explosión
-    /// * `alcance`: alcance de la expansión 
-    /// 
-    /// # Returns
-    /// 
-    /// Result vacio o Error
     
     fn explotar_derecha(&mut self, mapa: &mut Mapa, fila: i32, columna: i32, alcance: i32) -> Result<(), Box<dyn Error>> {
         let mut columna_actual = columna as usize + 1;
         let mut cont: i32 = 1;
         while columna_actual < mapa.obtener_largo() && cont <= alcance {
-            if !self.explotar_celda(mapa, fila as usize, columna_actual as usize, &mut cont)? {
+            if !self.explotar_celda(mapa, fila as usize, columna_actual, &mut cont)? {
                 break;
             }
             cont += 1;
@@ -149,19 +112,6 @@ impl Explosion {
         } 
         Ok(())
     } 
-    
-    /// Simula la expansión de una explosión hacia la derecha del lugar de donde fué inciada.
-    /// 
-    /// # Argumentos 
-    /// 
-    /// * `mapa`: mapa sobre el cual se realiza la expansión
-    /// * `fila`: fila que indica el inicio de la explosión
-    /// * `columna`: columna que indica el inicio de la explosión
-    /// * `alcance`: alcance de la expansión 
-    /// 
-    /// # Returns
-    /// 
-    /// Result vacio o Error
     
     fn explotar_izquierda(&mut self, mapa: &mut Mapa, fila: i32, columna: i32, alcance: i32) -> Result<(), Box<dyn Error>>{
         let mut columna_actual= columna - 1;
@@ -175,20 +125,8 @@ impl Explosion {
         } 
         Ok(())
     }
-
-    /// "Explota" la celda indicada 
-    /// 
-    /// # Argumentos 
-    /// 
-    /// * `mapa`: mapa sobre el cual se realiza la explosión
-    /// * `fila`: fila en la que se va a explotar la celda
-    /// * `columna`: columna en la que se va a explotar la celda
-    /// * `cont`: contador actual para saber el ciclo de la explosión, se utiliza en el caso en el que haya un desvío y necesite recalcularse el alcance 
-    /// # Returns 
-    /// 
-    /// Result que puede ser booleano o Error. En el caso del booleano se interpreta como que la explosión "puede seguir" con su trayecto
-    /// Esto es porque en el caso en el que haya un objeto no traspasable, como una pared o un desvío, deberá parar la ejecución del ciclo invocante
-
+    
+    // cont se utiliza para indicar cuantas iteraciones realizó para una determinada dirección 
     fn explotar_celda(&mut self, mapa: &mut Mapa, fila: usize, columna: usize, cont: &mut i32) -> Result<bool, Box<dyn std::error::Error>> {
         let objeto = mapa.obtener_celda(fila, columna).map_err(|err| format!("Error al obtener la celda {}", err))?;
         match objeto {
@@ -230,9 +168,7 @@ impl Explosion {
 
 mod test {
     use super::*;
-    // fn enemigo(pv: usize) -> Enemigo {
-    //     Enemigo::new('F', pv, 0)
-    // }
+
     fn mapa_3_x_3 () -> Mapa {
         let enemigo = Celda::Enemigo { enemigo: Enemigo::new('F', 1, 0)  };
         let vacio = Celda::Vacio { representacion: '_' };
