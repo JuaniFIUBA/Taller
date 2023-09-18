@@ -26,26 +26,52 @@ pub enum Celda {
 }
 
 impl Celda {
+    /// Crea una celda vacía con una representación por defecto.
     pub fn vacio() -> Celda {
         Celda::Vacio { representacion: '_' }
     }
-    pub fn pared() -> Celda { 
+
+    /// Crea una celda de pared.
+    pub fn pared() -> Celda {
         Celda::Obstaculo { representacion: 'W' }
     }
-    pub fn roca() -> Celda { 
+
+    /// Crea una celda de roca.
+    pub fn roca() -> Celda {
         Celda::Obstaculo { representacion: 'R' }
     }
-    pub fn bomba_normal(alcance: usize) -> Celda { 
-        Celda::Bomba { representacion: 'B', alcance, de_traspaso: false }
+
+    /// Crea una celda de bomba normal con una representación, alcance y sin propiedad de traspaso.
+    pub fn bomba_normal(alcance: usize) -> Celda {
+        Celda::Bomba {
+            representacion: 'B',
+            alcance,
+            de_traspaso: false,
+        }
     }
+
+    /// Crea una celda de bomba de traspaso con una representación, alcance y propiedad de traspaso.
     pub fn bomba_traspaso(alcance: usize) -> Celda {
-        Celda::Bomba { representacion: 'B' , alcance, de_traspaso: true }
+        Celda::Bomba {
+            representacion: 'B',
+            alcance,
+            de_traspaso: true,
+        }
     }
+
+    /// Crea una celda de enemigo con puntos de vida y un identificador.
     pub fn enemigo(pv: usize, id: u32) -> Celda {
-        Celda::Enemigo { enemigo: Enemigo::new('F', pv, id) }
+        Celda::Enemigo {
+            enemigo: Enemigo::new('F', pv, id),
+        }
     }
+
+    /// Crea una celda de desvío con una representación y dirección.
     pub fn desvio(direccion: char) -> Celda {
-        Celda::Desvio { representacion: 'D' , direccion}
+        Celda::Desvio {
+            representacion: 'D',
+            direccion,
+        }
     }
     /// Obtiene la representación de la celda como un string.
     pub fn obtener_representacion(&self) -> String {
