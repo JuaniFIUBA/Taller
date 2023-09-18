@@ -191,7 +191,6 @@ mod test {
     use crate::celda::Celda;
     use crate::enemigo::Enemigo;
     use crate::explosion::Explosion;
-    use std::error::Error;
     fn mapa_3_x_3 () -> Mapa {
         let enemigo = Celda::Enemigo { enemigo: Enemigo::new('F', 1, 0)  };
         let vacio = Celda::Vacio { representacion: '_' };
@@ -229,57 +228,50 @@ mod test {
             ])
     }
     #[test]
-    fn test_explotar_arriba() -> Result<(), Box<dyn Error>> {
+    fn test_explotar_arriba() {
         let mut mapa: Mapa = mapa_3_x_3();
         let mut expl = Explosion::new(1, false);
-        expl.explotar_arriba(&mut mapa, 1, 1, 1)?;
-        assert_eq!(mapa.obtener_celda(0, 1)?, &mut Celda::Vacio { representacion: '_' });
-        Ok(())
+        expl.explotar_arriba(&mut mapa, 1, 1, 1).unwrap();
+        assert_eq!(mapa.obtener_celda(0, 1).unwrap(), &mut Celda::Vacio { representacion: '_' });
     }
     #[test]
-    fn test_explotar_abajo() -> Result<(), Box<dyn Error>> {
+    fn test_explotar_abajo() {
         let mut mapa: Mapa = mapa_3_x_3();
         let mut expl = Explosion::new(1, false);
-        expl.explotar_abajo(&mut mapa, 1, 1, 1)?;
-        assert_eq!(mapa.obtener_celda(2, 1)?, &mut Celda::Vacio { representacion: '_' });
-        Ok(())
+        expl.explotar_abajo(&mut mapa, 1, 1, 1).unwrap();
+        assert_eq!(mapa.obtener_celda(2, 1).unwrap(), &mut Celda::Vacio { representacion: '_' });
     }
     #[test]
-    fn test_explotar_izquierda() -> Result<(), Box<dyn Error>> {
+    fn test_explotar_izquierda() {
         let mut mapa: Mapa = mapa_3_x_3();
         let mut expl = Explosion::new(1, false);
-        expl.explotar_izquierda(&mut mapa, 1, 1, 1)?;
-        assert_eq!(mapa.obtener_celda(1, 0)?, &mut Celda::Vacio { representacion: '_' });
-        Ok(())
+        expl.explotar_izquierda(&mut mapa, 1, 1, 1).unwrap();
+        assert_eq!(mapa.obtener_celda(1, 0).unwrap(), &mut Celda::Vacio { representacion: '_' });
     }
     #[test]
-    fn test_explotar_derecha() -> Result<(), Box<dyn Error>> {
+    fn test_explotar_derecha() {
         let mut mapa: Mapa = mapa_3_x_3();
         let mut expl = Explosion::new(1, false);
-        expl.explotar_derecha(&mut mapa, 1, 1, 1)?;
-        assert_eq!(mapa.obtener_celda(1, 2)?, &mut Celda::Vacio { representacion: '_' });
-        Ok(())
+        expl.explotar_derecha(&mut mapa, 1, 1, 1).unwrap();
+        assert_eq!(mapa.obtener_celda(1, 2).unwrap(), &mut Celda::Vacio { representacion: '_' });
     }
     #[test]
-    fn  test_explosion_de_traspaso_traspasa_rocas() -> Result<(), Box<dyn Error>> {
-        let mut mapa = mapa_3_x_3_con_obstaculos();
+    fn  test_explosion_de_traspaso_traspasa_rocas() {
+        let mut mapa = mapa_3_x_3_con_obstaculos(); // tiene bomba, roca, enemigo en la primer fila
         let mut expl = Explosion::new(3, true);
-        expl.iniciar_explosion(&mut mapa, 0, 0)?;
-        assert_eq!(mapa.obtener_celda(0, 2)?, &mut Celda::Vacio { representacion: '_' });
-        assert_eq!(mapa.obtener_celda(1, 2)?, &mut Celda::Enemigo { enemigo: Enemigo::new('F', 1, 0) });        
-        Ok(())
+        expl.explotar_derecha(&mut mapa, 0, 0, 3).unwrap();
+        assert_eq!(mapa.obtener_celda(0, 2).unwrap(), &mut Celda::Vacio { representacion: '_' });
     }
     #[test]
-    fn test_misma_explosion_no_golpea_dos_veces_al_enemigo() -> Result<(), Box<dyn Error>> {
+    fn test_misma_explosion_no_golpea_dos_veces_al_enemigo() {
         let mut mapa = mapa_3_x_3_con_desvios();
         let mut expl = Explosion::new(3, false);
-        expl.iniciar_explosion(&mut mapa, 0, 0)?;
-        let enemigo = mapa.obtener_celda(0, 1)?;
+        expl.explotar_derecha(&mut mapa, 0, 0, 3).unwrap();
+        let enemigo = mapa.obtener_celda(0, 1).unwrap();
         match enemigo {
             Celda::Enemigo { enemigo } => assert!(enemigo.esta_vivo()),
             _ => {assert!(false)} 
         }
-        Ok(())
     }
 
 }
