@@ -1,6 +1,5 @@
 use std::fs::File;
 use std::io::{self, Write, BufRead};
-use super::enemigo::Enemigo;
 use super::celda::Celda;
 
 /// Representa a un mapa que contiene celdas con objetos
@@ -161,22 +160,18 @@ fn crear_objeto(palabra: &str, cant_enemigos: &mut u32) -> Result<Celda, Box<dyn
     let obj = repr.chars().next().ok_or("Error al objener la representacion")?;
     match obj {
         '_' => {Ok(Celda::Vacio { representacion: '_' })},
-        'B' | 'S' => {
-            let alcance = atrib.parse::<usize>()?;
-            if obj == 'B' {Ok(Celda::Bomba { representacion: obj, alcance, de_traspaso: false })}
-                else {Ok(Celda::Bomba { representacion: obj, alcance, de_traspaso: true })}
-        }
-        'R' | 'W' => {  
-            Ok(Celda::Obstaculo { representacion: obj })
-        },
+        'B' => {Ok(Celda::bomba_normal(atrib.parse::<usize>()?))},
+        'S' => {Ok(Celda::bomba_traspaso(atrib.parse::<usize>()?))},
+        'R' => {Ok(Celda::roca())},
+        'W' => {Ok(Celda::pared())},
         'F' => {
             let pv = atrib.parse::<usize>()?;
             *cant_enemigos += 1;
-            Ok(Celda::Enemigo { enemigo: Enemigo::new(obj, pv, *cant_enemigos)})
+            Ok(Celda::enemigo(pv, *cant_enemigos))
         },
         'D' => {
             let dir = atrib.chars().next().ok_or("Dirección de desvío inválida")?;
-            Ok(Celda::Desvio { representacion: obj, direccion: dir })
+            Ok(Celda::desvio(dir))
         },
         _ => {Err(Box::new(std::io::Error::new(std::io::ErrorKind::Other, "Objeto no reconocido")))} // aca va error
     }

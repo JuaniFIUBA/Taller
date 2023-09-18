@@ -26,6 +26,27 @@ pub enum Celda {
 }
 
 impl Celda {
+    pub fn vacio() -> Celda {
+        Celda::Vacio { representacion: '_' }
+    }
+    pub fn pared() -> Celda { 
+        Celda::Obstaculo { representacion: 'W' }
+    }
+    pub fn roca() -> Celda { 
+        Celda::Obstaculo { representacion: 'R' }
+    }
+    pub fn bomba_normal(alcance: usize) -> Celda { 
+        Celda::Bomba { representacion: 'B', alcance, de_traspaso: false }
+    }
+    pub fn bomba_traspaso(alcance: usize) -> Celda {
+        Celda::Bomba { representacion: 'B' , alcance, de_traspaso: true }
+    }
+    pub fn enemigo(pv: usize, id: u32) -> Celda {
+        Celda::Enemigo { enemigo: Enemigo::new('F', pv, id) }
+    }
+    pub fn desvio(direccion: char) -> Celda {
+        Celda::Desvio { representacion: 'D' , direccion}
+    }
     /// Obtiene la representación de la celda como un string.
     pub fn obtener_representacion(&self) -> String {
         match self {
