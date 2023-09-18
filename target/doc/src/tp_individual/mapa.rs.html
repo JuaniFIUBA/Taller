@@ -196,14 +196,8 @@
 <a href="#196" id="196">196</a>
 <a href="#197" id="197">197</a>
 <a href="#198" id="198">198</a>
-<a href="#199" id="199">199</a>
-<a href="#200" id="200">200</a>
-<a href="#201" id="201">201</a>
-<a href="#202" id="202">202</a>
-<a href="#203" id="203">203</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::fs::File;
 <span class="kw">use </span>std::io::{<span class="self">self</span>, Write, BufRead};
-<span class="kw">use </span><span class="kw">super</span>::enemigo::Enemigo;
 <span class="kw">use </span><span class="kw">super</span>::celda::Celda;
 
 <span class="doccomment">/// Representa a un mapa que contiene celdas con objetos
@@ -364,22 +358,18 @@
     <span class="kw">let </span>obj = repr.chars().next().ok_or(<span class="string">&quot;Error al objener la representacion&quot;</span>)<span class="question-mark">?</span>;
     <span class="kw">match </span>obj {
         <span class="string">&#39;_&#39; </span>=&gt; {<span class="prelude-val">Ok</span>(Celda::Vacio { representacion: <span class="string">&#39;_&#39; </span>})},
-        <span class="string">&#39;B&#39; </span>| <span class="string">&#39;S&#39; </span>=&gt; {
-            <span class="kw">let </span>alcance = atrib.parse::&lt;usize&gt;()<span class="question-mark">?</span>;
-            <span class="kw">if </span>obj == <span class="string">&#39;B&#39; </span>{<span class="prelude-val">Ok</span>(Celda::Bomba { representacion: obj, alcance, de_traspaso: <span class="bool-val">false </span>})}
-                <span class="kw">else </span>{<span class="prelude-val">Ok</span>(Celda::Bomba { representacion: obj, alcance, de_traspaso: <span class="bool-val">true </span>})}
-        }
-        <span class="string">&#39;R&#39; </span>| <span class="string">&#39;W&#39; </span>=&gt; {  
-            <span class="prelude-val">Ok</span>(Celda::Obstaculo { representacion: obj })
-        },
+        <span class="string">&#39;B&#39; </span>=&gt; {<span class="prelude-val">Ok</span>(Celda::bomba_normal(atrib.parse::&lt;usize&gt;()<span class="question-mark">?</span>))},
+        <span class="string">&#39;S&#39; </span>=&gt; {<span class="prelude-val">Ok</span>(Celda::bomba_traspaso(atrib.parse::&lt;usize&gt;()<span class="question-mark">?</span>))},
+        <span class="string">&#39;R&#39; </span>=&gt; {<span class="prelude-val">Ok</span>(Celda::roca())},
+        <span class="string">&#39;W&#39; </span>=&gt; {<span class="prelude-val">Ok</span>(Celda::pared())},
         <span class="string">&#39;F&#39; </span>=&gt; {
             <span class="kw">let </span>pv = atrib.parse::&lt;usize&gt;()<span class="question-mark">?</span>;
             <span class="kw-2">*</span>cant_enemigos += <span class="number">1</span>;
-            <span class="prelude-val">Ok</span>(Celda::Enemigo { enemigo: Enemigo::new(obj, pv, <span class="kw-2">*</span>cant_enemigos)})
+            <span class="prelude-val">Ok</span>(Celda::enemigo(pv, <span class="kw-2">*</span>cant_enemigos))
         },
         <span class="string">&#39;D&#39; </span>=&gt; {
             <span class="kw">let </span>dir = atrib.chars().next().ok_or(<span class="string">&quot;Dirección de desvío inválida&quot;</span>)<span class="question-mark">?</span>;
-            <span class="prelude-val">Ok</span>(Celda::Desvio { representacion: obj, direccion: dir })
+            <span class="prelude-val">Ok</span>(Celda::desvio(dir))
         },
         <span class="kw">_ </span>=&gt; {<span class="prelude-val">Err</span>(Box::new(std::io::Error::new(std::io::ErrorKind::Other, <span class="string">&quot;Objeto no reconocido&quot;</span>)))} <span class="comment">// aca va error
     </span>}
