@@ -98,6 +98,25 @@ impl Explosion {
         Ok(())
     }
 
+    #[cfg(test)] 
+    pub fn explotar_test(mapa: &mut Mapa, x: i32, y: i32) -> Result<(), Box<dyn Error>> { 
+        match mapa.obtener_celda(y as usize, x as usize).map_err(|err| format!("{}", err)) {
+            Ok(bomba) => { //
+                match bomba {
+                    Celda::Bomba { representacion: _, alcance, de_traspaso } => {
+                        Explosion::new(*alcance as i32, *de_traspaso).iniciar_explosion(mapa, y, x)?;},
+                    _ => {
+                        return Err(Box::new(std::io::Error::new(std::io::ErrorKind::Other, "No hay una bomba en la posicion elegida")));
+                    }
+                }
+            
+            },
+            Err(err) => {
+                return Err(Box::new(std::io::Error::new(std::io::ErrorKind::Other, err)));}
+        }
+        Ok(())
+    }
+
     // Precondicion: en el lugar hay una bomba
     // borra la celda para que en caso de que se detone otra bomba, la explosion no la haga volver a explotar y generar recursion infinita.
     // Luego llama a 4 funciones que iteran hacia las 4 direcciones posibles, detonando las celdas correspondientes al alcance.  
@@ -191,12 +210,12 @@ impl Explosion {
                 Ok(true)},
             Celda::Desvio { representacion: _, direccion } => {
                 let dir_actual = self.sentido;
-                let copia_direccion_desvio = direccion.clone();
-                match &*direccion { // desref y ref no mutable para comparar
-                    &ARRIBA => {self.explotar_arriba(mapa, fila as i32, columna as i32, self.alcance - *cont)?;},
-                    &ABAJO => {self.explotar_abajo(mapa, fila as i32, columna as i32, self.alcance - *cont)?;},
-                    &DERECHA => {self.explotar_derecha(mapa, fila as i32, columna as i32, self.alcance - *cont)?;},
-                    &IZQUIERDA => {self.explotar_izquierda(mapa, fila as i32, columna as i32, self.alcance - *cont)?;},
+                let copia_direccion_desvio = *direccion;
+                match *direccion { // desref y ref no mutable para comparar
+                    ARRIBA => {self.explotar_arriba(mapa, fila as i32, columna as i32, self.alcance - *cont)?;},
+                    ABAJO => {self.explotar_abajo(mapa, fila as i32, columna as i32, self.alcance - *cont)?;},
+                    DERECHA => {self.explotar_derecha(mapa, fila as i32, columna as i32, self.alcance - *cont)?;},
+                    IZQUIERDA => {self.explotar_izquierda(mapa, fila as i32, columna as i32, self.alcance - *cont)?;},
                     _ => {return Err(Box::new(std::io::Error::new(std::io::ErrorKind::Other, "Error al obtener la direccion del desvio")));}
                 } if dir_actual == copia_direccion_desvio {Ok(true)} else {Ok(false)} 
                 // si la direccion antes del desvio es igual a la direccion del desvio, debera seguir con la explosion
