@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":["main"],"mod":["celda","enemigo","explosion","io","mapa"]};
+window.SIDEBAR_ITEMS = {"mod":["celda","enemigo","explosion","io","mapa"]};

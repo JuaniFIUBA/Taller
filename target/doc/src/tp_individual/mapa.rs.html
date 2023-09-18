@@ -200,10 +200,11 @@
 <a href="#200" id="200">200</a>
 <a href="#201" id="201">201</a>
 <a href="#202" id="202">202</a>
+<a href="#203" id="203">203</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::fs::File;
 <span class="kw">use </span>std::io::{<span class="self">self</span>, Write, BufRead};
-<span class="kw">use </span><span class="kw">crate</span>::Celda;
-<span class="kw">use </span><span class="kw">crate</span>::Enemigo;
+<span class="kw">use </span><span class="kw">super</span>::enemigo::Enemigo;
+<span class="kw">use </span><span class="kw">super</span>::celda::Celda;
 
 <span class="doccomment">/// Representa a un mapa que contiene celdas con objetos
 </span><span class="kw">pub struct </span>Mapa {
@@ -214,8 +215,7 @@
 
 
 <span class="kw">impl </span>Mapa {    
-    <span class="attr">#[cfg(test)]
-    </span><span class="doccomment">/// Dada una grilla crea una instanc}ia de Mapa
+    <span class="doccomment">/// Dada una grilla crea una instanc}ia de Mapa
     </span><span class="kw">pub fn </span>new(grilla: Vec&lt;Vec&lt;Celda&gt;&gt;) -&gt; Mapa {
         Mapa { grilla }
     }
@@ -258,11 +258,12 @@
     /// # Ejemplo
     /// Lo que sea referido como celda°n, hace referencia a una instancia de celda 
     /// ```
-    /// use mapa::Enemigo;
-    /// use celda::Celda;
+    /// use tp_individual::mapa::Mapa;
+    /// use tp_individual::celda::Celda;
+    /// let celda = Celda::Vacio{ representacion: &#39;_&#39; };
     /// let mapa = Mapa::new(vec![
-    ///                         vec![celda1, celda2],]
-    ///                         vec![celda3, celda4]);
+    ///                         vec![celda.clone(), celda.clone()],
+    ///                         vec![celda.clone(), celda.clone()]]);
     /// assert_eq!(mapa.obtener_largo(), 2);
     /// ```
     
@@ -285,12 +286,13 @@
     /// # Ejemplo
     /// Lo que sea referido como celda°n, hace referencia a una instancia de celda 
     /// ```
-    /// use mapa::Enemigo;
-    /// use celda::Celda;
-    /// let mapa = Mapa::new(vec![
-    ///                         vec![celda1, celda2],]
-    ///                         vec![celda3, celda4]);
-    /// assert_eq!(mapa.obtener_celda()?, &amp;mut celda1);
+    /// use tp_individual::mapa::Mapa;
+    /// use tp_individual::celda::Celda;
+    /// let mut celda = Celda::Vacio{ representacion: &#39;_&#39; };
+    /// let mut mapa = Mapa::new(vec![
+    ///                         vec![celda.clone(), celda.clone()],
+    ///                         vec![celda.clone(), celda.clone()]]);
+    /// assert_eq!(mapa.obtener_celda(0, 0).unwrap(), &amp;celda);
     /// ```
 
     </span><span class="comment">// Al ser usize, la fila y columna no pueden ser menores a 0

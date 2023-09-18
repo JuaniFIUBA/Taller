@@ -283,27 +283,10 @@
 <a href="#283" id="283">283</a>
 <a href="#284" id="284">284</a>
 <a href="#285" id="285">285</a>
-<a href="#286" id="286">286</a>
-<a href="#287" id="287">287</a>
-<a href="#288" id="288">288</a>
-<a href="#289" id="289">289</a>
-<a href="#290" id="290">290</a>
-<a href="#291" id="291">291</a>
-<a href="#292" id="292">292</a>
-<a href="#293" id="293">293</a>
-<a href="#294" id="294">294</a>
-<a href="#295" id="295">295</a>
-<a href="#296" id="296">296</a>
-<a href="#297" id="297">297</a>
-<a href="#298" id="298">298</a>
-<a href="#299" id="299">299</a>
-<a href="#300" id="300">300</a>
-<a href="#301" id="301">301</a>
-<a href="#302" id="302">302</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::Mapa;
-<span class="kw">use </span><span class="kw">crate</span>::Celda;
-<span class="kw">use </span><span class="kw">crate</span>::Enemigo;
-<span class="kw">use </span><span class="kw">crate</span>::io;
+</pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::mapa::Mapa;
+<span class="kw">use </span><span class="kw">super</span>::celda::Celda;
+<span class="kw">use </span><span class="kw">super</span>::enemigo::Enemigo;
+<span class="kw">use </span><span class="kw">super</span>::io;
 <span class="kw">use </span>std::error::Error;
 <span class="doccomment">/// Simula una explosion 
 
@@ -329,7 +312,7 @@
     /// # Ejemplo
     ///
     /// ```
-    /// use explosion::Explosion;
+    /// use tp_individual::explosion::Explosion;
     ///
     /// let explosion = Explosion::new(3, true);
     /// ```
@@ -356,8 +339,8 @@
     /// # Ejemplo
     ///
     /// ``` ejemplo
-    /// use explosion::Explosion;
-    /// use mapa::Mapa;
+    /// use tp_individual::explosion::Explosion;
+    /// use tp_individual::mapa::Mapa;
     /// let mapa = Mapa::new(vec![vec![&#39;B1&#39;]]);
     /// let file_path = &quot;/home/usr/carpeta&quot;;
     /// 
@@ -383,30 +366,10 @@
         }
         <span class="prelude-val">Ok</span>(())
     }
-    <span class="doccomment">/// Simula la explosión de una bomba en el lugar indicado, borra la posición inicial ya que 
-    /// es una bomba, luego &quot;expande&quot; la explosión hacia sus costados
-    /// El caso en el que no es una bomba está contemplado fuera de la explosión, entonces una precondición será
-    /// que el lugar indicado sea una bomba efectivamente.
-    /// 
-    /// # Argumentos
-    ///
-    /// * `mapa`: mapa sobre el cual se realizará la explosión .
-    /// * `fila`: fila sobre la cual se iniciara la explosión .
-    /// * `columna`: columna sobre la cual se iniciara la explosión .
-    ///
-    /// # Returns
-    /// Result vacio o error
-    /// 
-    /// # Ejemplo
-    ///
-    /// ``` ejemplo
-    /// use explosion::Explosion;
-    /// use mapa::Mapa;
-    /// let mapa = Mapa::new(vec![vec![&#39;B1&#39;]]);
-    /// 
-    /// Explosion::new(3, true).iniciar_explosion(mapa, 0, 0);
-    /// ```
 
+    <span class="comment">// Precondicion: en el lugar hay una bomba
+    // borra la celda para que en caso de que se detone otra bomba, la explosion no la haga volver a explotar y generar recursion infinita.
+    // Luego llama a 4 funciones que iteran hacia las 4 direcciones posibles, detonando las celdas correspondientes al alcance.  
     </span><span class="kw">fn </span>iniciar_explosion(<span class="kw-2">&amp;mut </span><span class="self">self</span>, mapa: <span class="kw-2">&amp;mut </span>Mapa ,fila: i32, columna: i32) -&gt; <span class="prelude-ty">Result</span>&lt;(), Box&lt;<span class="kw">dyn </span>Error&gt;&gt; {        
         mapa.borrar(fila <span class="kw">as </span>usize, columna <span class="kw">as </span>usize);
         <span class="self">self</span>.explotar_abajo(mapa, fila, columna, <span class="self">self</span>.alcance)<span class="question-mark">?</span>;
@@ -416,8 +379,7 @@
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="comment">// Itera hacia abajo del mapa y &quot;explota&quot; las celdas encontradas, lo mismo para las explposiones 
-    // hacia otros lados
+    <span class="comment">// Itera hacia abajo del mapa y &quot;explota&quot; las celdas encontradas, idem para las explposiones hacia otras direcciones.
     </span><span class="kw">fn </span>explotar_abajo(<span class="kw-2">&amp;mut </span><span class="self">self</span>, mapa: <span class="kw-2">&amp;mut </span>Mapa, fila: i32, columna: i32, alcance: i32) -&gt; <span class="prelude-ty">Result</span>&lt;(), Box&lt;<span class="kw">dyn </span>Error&gt;&gt;{
         <span class="kw">let </span><span class="kw-2">mut </span>fila_actual = fila <span class="kw">as </span>usize + <span class="number">1</span>;
         <span class="kw">let </span><span class="kw-2">mut </span>cont: i32 = <span class="number">1</span>;
@@ -506,99 +468,103 @@
 }
 
 
-<span class="comment">// #[cfg(test)]
+<span class="attr">#[cfg(test)]
 
-// mod test {
-//     use super::*;
+</span><span class="kw">mod </span>test {
+    <span class="comment">// use super::*;
+    </span><span class="kw">use </span><span class="kw">crate</span>::mapa::Mapa;
+    <span class="kw">use </span><span class="kw">crate</span>::celda::Celda;
+    <span class="kw">use </span><span class="kw">crate</span>::enemigo::Enemigo;
+    <span class="kw">use </span><span class="kw">crate</span>::explosion::Explosion;
+    <span class="kw">use </span>std::error::Error;
+    <span class="kw">fn </span>mapa_3_x_3 () -&gt; Mapa {
+        <span class="kw">let </span>enemigo = Celda::Enemigo { enemigo: Enemigo::new(<span class="string">&#39;F&#39;</span>, <span class="number">1</span>, <span class="number">0</span>)  };
+        <span class="kw">let </span>vacio = Celda::Vacio { representacion: <span class="string">&#39;_&#39; </span>};
+        <span class="kw">let </span>bomba = Celda::Bomba { representacion: <span class="string">&#39;B&#39;</span>, alcance: <span class="number">1</span>, de_traspaso: <span class="bool-val">false </span>};
 
-//     fn mapa_3_x_3 () -&gt; Mapa {
-//         let enemigo = Celda::Enemigo { enemigo: Enemigo::new(&#39;F&#39;, 1, 0)  };
-//         let vacio = Celda::Vacio { representacion: &#39;_&#39; };
-//         let bomba = Celda::Bomba { representacion: &#39;B&#39;, alcance: 1, de_traspaso: false };
+        Mapa::new(<span class="macro">vec!</span>[
+            <span class="macro">vec!</span>[vacio.clone(), enemigo.clone(), vacio.clone()],
+            <span class="macro">vec!</span>[enemigo.clone(), bomba.clone(), enemigo.clone()],
+            <span class="macro">vec!</span>[vacio.clone(), enemigo.clone(), vacio.clone()]
+            ])
+    }
+    <span class="kw">fn </span>mapa_3_x_3_con_obstaculos() -&gt; Mapa {
+        <span class="kw">let </span>enemigo = Celda::Enemigo { enemigo: Enemigo::new(<span class="string">&#39;F&#39;</span>, <span class="number">1</span>, <span class="number">0</span>)  };
+        <span class="kw">let </span>vacio = Celda::Vacio { representacion: <span class="string">&#39;_&#39; </span>};
+        <span class="kw">let </span>bomba = Celda::Bomba { representacion: <span class="string">&#39;S&#39;</span>, alcance: <span class="number">3</span>, de_traspaso: <span class="bool-val">false </span>};
+        <span class="kw">let </span>roca = Celda::Obstaculo { representacion: <span class="string">&#39;R&#39; </span>};
+        <span class="kw">let </span>pared = Celda::Obstaculo { representacion: <span class="string">&#39;W&#39; </span>};
 
-//         Mapa::new(vec![
-//             vec![vacio.clone(), enemigo.clone(), vacio.clone()],
-//             vec![enemigo.clone(), bomba.clone(), enemigo.clone()],
-//             vec![vacio.clone(), enemigo.clone(), vacio.clone()]
-//             ])
-//     }
-//     fn mapa_3_x_3_con_obstaculos() -&gt; Mapa {
-//         let enemigo = Celda::Enemigo { enemigo: Enemigo::new(&#39;F&#39;, 1, 0)  };
-//         let vacio = Celda::Vacio { representacion: &#39;_&#39; };
-//         let bomba = Celda::Bomba { representacion: &#39;S&#39;, alcance: 3, de_traspaso: false };
-//         let roca = Celda::Obstaculo { representacion: &#39;R&#39; };
-//         let pared = Celda::Obstaculo { representacion: &#39;W&#39; };
+        Mapa::new(<span class="macro">vec!</span>[
+            <span class="macro">vec!</span>[bomba.clone(), roca.clone(), enemigo.clone()],
+            <span class="macro">vec!</span>[bomba.clone(), pared.clone(), enemigo.clone()],
+            <span class="macro">vec!</span>[vacio.clone(), vacio.clone(), vacio.clone()]
+            ])
+    }
+    <span class="kw">fn </span>mapa_3_x_3_con_desvios() -&gt; Mapa {
+        <span class="kw">let </span>enemigo = Celda::Enemigo { enemigo: Enemigo::new(<span class="string">&#39;F&#39;</span>, <span class="number">2</span>, <span class="number">0</span>)  };
+        <span class="kw">let </span>vacio = Celda::Vacio { representacion: <span class="string">&#39;_&#39; </span>};
+        <span class="kw">let </span>bomba = Celda::Bomba { representacion: <span class="string">&#39;S&#39;</span>, alcance: <span class="number">3</span>, de_traspaso: <span class="bool-val">false </span>};
+        <span class="kw">let </span>desvio_izquierda = Celda::Desvio { representacion: <span class="string">&#39;D&#39;</span>, direccion: <span class="string">&#39;L&#39; </span>};
 
-//         Mapa::new(vec![
-//             vec![bomba.clone(), roca.clone(), enemigo.clone()],
-//             vec![bomba.clone(), pared.clone(), enemigo.clone()],
-//             vec![vacio.clone(), vacio.clone(), vacio.clone()]
-//             ])
-//     }
-//     fn mapa_3_x_3_con_desvios() -&gt; Mapa {
-//         let enemigo = Celda::Enemigo { enemigo: Enemigo::new(&#39;F&#39;, 2, 0)  };
-//         let vacio = Celda::Vacio { representacion: &#39;_&#39; };
-//         let bomba = Celda::Bomba { representacion: &#39;S&#39;, alcance: 3, de_traspaso: false };
-//         let desvio_izquierda = Celda::Desvio { representacion: &#39;D&#39;, direccion: &#39;L&#39; };
+        Mapa::new(<span class="macro">vec!</span>[
+            <span class="macro">vec!</span>[bomba.clone(), enemigo.clone(), desvio_izquierda.clone()],
+            <span class="macro">vec!</span>[vacio.clone(), vacio.clone(), vacio.clone()],
+            <span class="macro">vec!</span>[vacio.clone(), vacio.clone(), vacio.clone()]
+            ])
+    }
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_explotar_arriba() -&gt; <span class="prelude-ty">Result</span>&lt;(), Box&lt;<span class="kw">dyn </span>Error&gt;&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>mapa: Mapa = mapa_3_x_3();
+        <span class="kw">let </span><span class="kw-2">mut </span>expl = Explosion::new(<span class="number">1</span>, <span class="bool-val">false</span>);
+        expl.explotar_arriba(<span class="kw-2">&amp;mut </span>mapa, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>)<span class="question-mark">?</span>;
+        <span class="macro">assert_eq!</span>(mapa.obtener_celda(<span class="number">0</span>, <span class="number">1</span>)<span class="question-mark">?</span>, <span class="kw-2">&amp;mut </span>Celda::Vacio { representacion: <span class="string">&#39;_&#39; </span>});
+        <span class="prelude-val">Ok</span>(())
+    }
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_explotar_abajo() -&gt; <span class="prelude-ty">Result</span>&lt;(), Box&lt;<span class="kw">dyn </span>Error&gt;&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>mapa: Mapa = mapa_3_x_3();
+        <span class="kw">let </span><span class="kw-2">mut </span>expl = Explosion::new(<span class="number">1</span>, <span class="bool-val">false</span>);
+        expl.explotar_abajo(<span class="kw-2">&amp;mut </span>mapa, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>)<span class="question-mark">?</span>;
+        <span class="macro">assert_eq!</span>(mapa.obtener_celda(<span class="number">2</span>, <span class="number">1</span>)<span class="question-mark">?</span>, <span class="kw-2">&amp;mut </span>Celda::Vacio { representacion: <span class="string">&#39;_&#39; </span>});
+        <span class="prelude-val">Ok</span>(())
+    }
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_explotar_izquierda() -&gt; <span class="prelude-ty">Result</span>&lt;(), Box&lt;<span class="kw">dyn </span>Error&gt;&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>mapa: Mapa = mapa_3_x_3();
+        <span class="kw">let </span><span class="kw-2">mut </span>expl = Explosion::new(<span class="number">1</span>, <span class="bool-val">false</span>);
+        expl.explotar_izquierda(<span class="kw-2">&amp;mut </span>mapa, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>)<span class="question-mark">?</span>;
+        <span class="macro">assert_eq!</span>(mapa.obtener_celda(<span class="number">1</span>, <span class="number">0</span>)<span class="question-mark">?</span>, <span class="kw-2">&amp;mut </span>Celda::Vacio { representacion: <span class="string">&#39;_&#39; </span>});
+        <span class="prelude-val">Ok</span>(())
+    }
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_explotar_derecha() -&gt; <span class="prelude-ty">Result</span>&lt;(), Box&lt;<span class="kw">dyn </span>Error&gt;&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>mapa: Mapa = mapa_3_x_3();
+        <span class="kw">let </span><span class="kw-2">mut </span>expl = Explosion::new(<span class="number">1</span>, <span class="bool-val">false</span>);
+        expl.explotar_derecha(<span class="kw-2">&amp;mut </span>mapa, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>)<span class="question-mark">?</span>;
+        <span class="macro">assert_eq!</span>(mapa.obtener_celda(<span class="number">1</span>, <span class="number">2</span>)<span class="question-mark">?</span>, <span class="kw-2">&amp;mut </span>Celda::Vacio { representacion: <span class="string">&#39;_&#39; </span>});
+        <span class="prelude-val">Ok</span>(())
+    }
+    <span class="attr">#[test]
+    </span><span class="kw">fn  </span>test_explosion_de_traspaso_traspasa_rocas() -&gt; <span class="prelude-ty">Result</span>&lt;(), Box&lt;<span class="kw">dyn </span>Error&gt;&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>mapa = mapa_3_x_3_con_obstaculos();
+        <span class="kw">let </span><span class="kw-2">mut </span>expl = Explosion::new(<span class="number">3</span>, <span class="bool-val">true</span>);
+        expl.iniciar_explosion(<span class="kw-2">&amp;mut </span>mapa, <span class="number">0</span>, <span class="number">0</span>)<span class="question-mark">?</span>;
+        <span class="macro">assert_eq!</span>(mapa.obtener_celda(<span class="number">0</span>, <span class="number">2</span>)<span class="question-mark">?</span>, <span class="kw-2">&amp;mut </span>Celda::Vacio { representacion: <span class="string">&#39;_&#39; </span>});
+        <span class="macro">assert_eq!</span>(mapa.obtener_celda(<span class="number">1</span>, <span class="number">2</span>)<span class="question-mark">?</span>, <span class="kw-2">&amp;mut </span>Celda::Enemigo { enemigo: Enemigo::new(<span class="string">&#39;F&#39;</span>, <span class="number">1</span>, <span class="number">0</span>) });        
+        <span class="prelude-val">Ok</span>(())
+    }
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_misma_explosion_no_golpea_dos_veces_al_enemigo() -&gt; <span class="prelude-ty">Result</span>&lt;(), Box&lt;<span class="kw">dyn </span>Error&gt;&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>mapa = mapa_3_x_3_con_desvios();
+        <span class="kw">let </span><span class="kw-2">mut </span>expl = Explosion::new(<span class="number">3</span>, <span class="bool-val">false</span>);
+        expl.iniciar_explosion(<span class="kw-2">&amp;mut </span>mapa, <span class="number">0</span>, <span class="number">0</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>enemigo = mapa.obtener_celda(<span class="number">0</span>, <span class="number">1</span>)<span class="question-mark">?</span>;
+        <span class="kw">match </span>enemigo {
+            Celda::Enemigo { enemigo } =&gt; <span class="macro">assert!</span>(enemigo.esta_vivo()),
+            <span class="kw">_ </span>=&gt; {<span class="macro">assert!</span>(<span class="bool-val">false</span>)} 
+        }
+        <span class="prelude-val">Ok</span>(())
+    }
 
-//         Mapa::new(vec![
-//             vec![bomba.clone(), enemigo.clone(), desvio_izquierda.clone()],
-//             vec![vacio.clone(), vacio.clone(), vacio.clone()],
-//             vec![vacio.clone(), vacio.clone(), vacio.clone()]
-//             ])
-//     }
-//     #[test]
-//     fn test_explotar_arriba() -&gt; Result&lt;(), Box&lt;dyn Error&gt;&gt; {
-//         let mut mapa: Mapa = mapa_3_x_3();
-//         let mut expl = Explosion::new(1, false);
-//         expl.explotar_arriba(&amp;mut mapa, 1, 1, 1)?;
-//         assert_eq!(mapa.obtener_celda(0, 1)?, &amp;mut Celda::Vacio { representacion: &#39;_&#39; });
-//         Ok(())
-//     }
-//     #[test]
-//     fn test_explotar_abajo() -&gt; Result&lt;(), Box&lt;dyn Error&gt;&gt; {
-//         let mut mapa: Mapa = mapa_3_x_3();
-//         let mut expl = Explosion::new(1, false);
-//         expl.explotar_abajo(&amp;mut mapa, 1, 1, 1)?;
-//         assert_eq!(mapa.obtener_celda(2, 1)?, &amp;mut Celda::Vacio { representacion: &#39;_&#39; });
-//         Ok(())
-//     }
-//     #[test]
-//     fn test_explotar_izquierda() -&gt; Result&lt;(), Box&lt;dyn Error&gt;&gt; {
-//         let mut mapa: Mapa = mapa_3_x_3();
-//         let mut expl = Explosion::new(1, false);
-//         expl.explotar_izquierda(&amp;mut mapa, 1, 1, 1)?;
-//         assert_eq!(mapa.obtener_celda(1, 0)?, &amp;mut Celda::Vacio { representacion: &#39;_&#39; });
-//         Ok(())
-//     }
-//     #[test]
-//     fn test_explotar_derecha() -&gt; Result&lt;(), Box&lt;dyn Error&gt;&gt; {
-//         let mut mapa: Mapa = mapa_3_x_3();
-//         let mut expl = Explosion::new(1, false);
-//         expl.explotar_derecha(&amp;mut mapa, 1, 1, 1)?;
-//         assert_eq!(mapa.obtener_celda(1, 2)?, &amp;mut Celda::Vacio { representacion: &#39;_&#39; });
-//         Ok(())
-//     }
-//     #[test]
-//     fn  test_explosion_de_traspaso_traspasa_rocas() -&gt; Result&lt;(), Box&lt;dyn Error&gt;&gt; {
-//         let mut mapa = mapa_3_x_3_con_obstaculos();
-//         let mut expl = Explosion::new(3, true);
-//         expl.iniciar_explosion(&amp;mut mapa, 0, 0)?;
-//         assert_eq!(mapa.obtener_celda(0, 2)?, &amp;mut Celda::Vacio { representacion: &#39;_&#39; });
-//         assert_eq!(mapa.obtener_celda(1, 2)?, &amp;mut Celda::Enemigo { enemigo: Enemigo::new(&#39;F&#39;, 1, 0) });        
-//         Ok(())
-//     }
-//     #[test]
-//     fn test_misma_explosion_no_golpea_dos_veces_al_enemigo() -&gt; Result&lt;(), Box&lt;dyn Error&gt;&gt; {
-//         let mut mapa = mapa_3_x_3_con_desvios();
-//         let mut expl = Explosion::new(3, false);
-//         expl.iniciar_explosion(&amp;mut mapa, 0, 0)?;
-//         let enemigo = mapa.obtener_celda(0, 1)?;
-//         match enemigo {
-//             Celda::Enemigo { enemigo } =&gt; assert!(enemigo.esta_vivo()),
-//             _ =&gt; {assert!(false)} 
-//         }
-//         Ok(())
-//     }
-
-// }</span></code></pre></div></section></main></body></html>
+}</code></pre></div></section></main></body></html>

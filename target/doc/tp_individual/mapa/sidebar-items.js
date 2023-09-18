@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":["crear_objeto"],"struct":["Mapa"]};
+window.SIDEBAR_ITEMS = {"struct":["Mapa"]};

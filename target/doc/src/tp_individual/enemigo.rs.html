@@ -78,9 +78,6 @@
 <a href="#78" id="78">78</a>
 <a href="#79" id="79">79</a>
 <a href="#80" id="80">80</a>
-<a href="#81" id="81">81</a>
-<a href="#82" id="82">82</a>
-<a href="#83" id="83">83</a>
 </pre></div><pre class="rust"><code><span class="doccomment">/// Representa a un enemigo en algún contexto.
 </span><span class="attr">#[derive(Debug, Clone, Copy, PartialEq)]
 </span><span class="kw">pub struct </span>Enemigo {
@@ -107,7 +104,7 @@
     /// # Ejemplo
     ///
     /// ```
-    /// use enemigo::Enemigo;
+    /// use tp_individual::enemigo::Enemigo;
     ///
     /// let enemigo = Enemigo::new(&#39;E&#39;, 4, 1);
     /// ```
@@ -125,7 +122,7 @@
     /// # Ejemplo
     ///
     /// ```
-    /// use enemigo::Enemigo;
+    /// use tp_individual::enemigo::Enemigo;
     ///
     /// let enemigo = Enemigo::new(&#39;E&#39;, 4, 1);
     /// let representacion = enemigo.obtener_representacion();
@@ -149,16 +146,13 @@
     /// # Ejemplo
     ///
     /// ```
-    /// use enemigo::Enemigo;
+    /// use tp_individual::enemigo::Enemigo;
     ///
     /// let mut enemigo = Enemigo::new(&#39;E&#39;, 2, 1);
     /// assert!(enemigo.esta_vivo());
     ///
     /// enemigo.herir();
     /// assert!(enemigo.esta_vivo());
-    ///
-    /// enemigo.pv = 0;
-    /// assert!(!enemigo.esta_vivo());
     /// ```
     </span><span class="kw">pub fn </span>esta_vivo(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.pv != <span class="number">0

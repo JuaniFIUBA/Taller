@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":["formatear_coordenada","guardar_error_y_salir","obtener_input"]};
+window.SIDEBAR_ITEMS = {"fn":["guardar_error_y_salir","obtener_input"]};
