@@ -5,6 +5,11 @@ use super::io;
 use std::error::Error;
 /// Simula una explosion 
 
+const ARRIBA: char = 'U';
+const ABAJO: char = 'D';
+const IZQUIERDA: char = 'L';
+const DERECHA: char = 'R';
+
 pub struct Explosion {
     /// Alcance de la explosión
     alcance: i32,
@@ -12,13 +17,23 @@ pub struct Explosion {
     /// Indicador de si la explosión fue generada por una bomba de traspaso
     de_traspaso: bool,
 
+    /// Indica el sentido de la explosion en todo momento
+    sentido: char, 
+
     /// Enemigos afectados por la explosión, se utiliza para no golpear dos veces al mismo enemigo con la misma explosión
     enemigos_afectados: Vec<Enemigo>
 }
 
 impl Explosion {
     /// Crea una nueva instancia de Explosión, con alcance y característica de traspaso    
+    /// La explosion comienza con sentido "hacia abajo".
+    /// # Tabla de equivalencias:
     /// 
+    /// * `D`: sentido hacia abajo.
+    /// * `U`: sentido hacia arriba.
+    /// * `L`: sentido hacia la izquierda.
+    /// * `R`: sentido hacia la derecha.
+    ///    
     /// # Argumentos
     ///
     /// * `alcance`: representa el alcance que tendrá la explosión .
@@ -35,6 +50,7 @@ impl Explosion {
         Explosion {
             alcance,
             de_traspaso,
+            sentido: ABAJO, // Empieza explotando hacia abajo
             enemigos_afectados: Vec::new()
         }
     }
@@ -96,6 +112,7 @@ impl Explosion {
 
     // Itera hacia abajo del mapa y "explota" las celdas encontradas, idem para las explposiones hacia otras direcciones.
     fn explotar_abajo(&mut self, mapa: &mut Mapa, fila: i32, columna: i32, alcance: i32) -> Result<(), Box<dyn Error>>{
+        self.sentido = ABAJO;
         let mut fila_actual = fila as usize + 1;
         let mut cont: i32 = 1;
         while fila_actual < mapa.obtener_largo() && cont <= alcance{
@@ -109,6 +126,7 @@ impl Explosion {
     }
     
     fn explotar_arriba(&mut self, mapa: &mut Mapa, fila: i32, columna: i32, alcance: i32) -> Result<(), Box<dyn Error>> {
+        self.sentido = ARRIBA;
         let mut fila_actual = fila - 1;
         let mut cont: i32 = 1; // Empieza en 1 porque estoy en el siguiente casillero de la expl
         while fila_actual >= 0 && cont  <= alcance{
@@ -122,6 +140,7 @@ impl Explosion {
     }
     
     fn explotar_derecha(&mut self, mapa: &mut Mapa, fila: i32, columna: i32, alcance: i32) -> Result<(), Box<dyn Error>> {
+        self.sentido = DERECHA;
         let mut columna_actual = columna as usize + 1;
         let mut cont: i32 = 1;
         while columna_actual < mapa.obtener_largo() && cont <= alcance {
@@ -135,6 +154,7 @@ impl Explosion {
     } 
     
     fn explotar_izquierda(&mut self, mapa: &mut Mapa, fila: i32, columna: i32, alcance: i32) -> Result<(), Box<dyn Error>>{
+        self.sentido = IZQUIERDA;
         let mut columna_actual= columna - 1;
         let mut cont: i32= 1;
         while columna_actual >= 0 && cont <= alcance{
@@ -170,13 +190,16 @@ impl Explosion {
                 } 
                 Ok(true)},
             Celda::Desvio { representacion: _, direccion } => {
-                match direccion {
-                    'U' => {self.explotar_arriba(mapa, fila as i32, columna as i32, self.alcance - *cont)?;},
-                    'D' => {self.explotar_abajo(mapa, fila as i32, columna as i32, self.alcance - *cont)?;},
-                    'R' => {self.explotar_derecha(mapa, fila as i32, columna as i32, self.alcance - *cont)?;},
-                    'L' => {self.explotar_izquierda(mapa, fila as i32, columna as i32, self.alcance - *cont)?;},
+                let dir_actual = self.sentido;
+                let copia_direccion_desvio = direccion.clone();
+                match &*direccion { // desref y ref no mutable para comparar
+                    &ARRIBA => {self.explotar_arriba(mapa, fila as i32, columna as i32, self.alcance - *cont)?;},
+                    &ABAJO => {self.explotar_abajo(mapa, fila as i32, columna as i32, self.alcance - *cont)?;},
+                    &DERECHA => {self.explotar_derecha(mapa, fila as i32, columna as i32, self.alcance - *cont)?;},
+                    &IZQUIERDA => {self.explotar_izquierda(mapa, fila as i32, columna as i32, self.alcance - *cont)?;},
                     _ => {return Err(Box::new(std::io::Error::new(std::io::ErrorKind::Other, "Error al obtener la direccion del desvio")));}
-                } Ok(false)
+                } if dir_actual == copia_direccion_desvio {Ok(true)} else {Ok(false)} 
+                // si la direccion antes del desvio es igual a la direccion del desvio, debera seguir con la explosion
             }
         }
     }

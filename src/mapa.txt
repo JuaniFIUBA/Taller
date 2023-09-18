@@ -1,4 +1,4 @@
 S6 B3 F3 DL
-B2 _ B1 _
+DD _ F1 _
 F2 _ _ _
 DR F1 _ B2
