@@ -231,42 +231,27 @@ mod test {
     // use super::*;
     use crate::mapa::Mapa;
     use crate::celda::Celda;
-    use crate::enemigo::Enemigo;
     use crate::explosion::Explosion;
     fn mapa_3_x_3 () -> Mapa {
-        let enemigo = Celda::Enemigo { enemigo: Enemigo::new('F', 1, 0)  };
-        let vacio = Celda::Vacio { representacion: '_' };
-        let bomba = Celda::Bomba { representacion: 'B', alcance: 1, de_traspaso: false };
-
         Mapa::new(vec![
-            vec![vacio.clone(), enemigo.clone(), vacio.clone()],
-            vec![enemigo.clone(), bomba.clone(), enemigo.clone()],
-            vec![vacio.clone(), enemigo.clone(), vacio.clone()]
+            vec![Celda::vacio(), Celda::enemigo(1, 0), Celda::vacio()],
+            vec![Celda::enemigo(1, 0), Celda::bomba_normal(1), Celda::enemigo(1, 0)],
+            vec![Celda::vacio(), Celda::enemigo(1, 0), Celda::vacio()]
             ])
     }
     fn mapa_3_x_3_con_obstaculos() -> Mapa {
-        let enemigo = Celda::Enemigo { enemigo: Enemigo::new('F', 1, 0)  };
-        let vacio = Celda::Vacio { representacion: '_' };
-        let bomba = Celda::Bomba { representacion: 'S', alcance: 3, de_traspaso: false };
-        let roca = Celda::Obstaculo { representacion: 'R' };
-        let pared = Celda::Obstaculo { representacion: 'W' };
 
         Mapa::new(vec![
-            vec![bomba.clone(), roca.clone(), enemigo.clone()],
-            vec![bomba.clone(), pared.clone(), enemigo.clone()],
-            vec![vacio.clone(), vacio.clone(), vacio.clone()]
+            vec![Celda::bomba_traspaso(3), Celda::roca(), Celda::enemigo(1, 0)],
+            vec![Celda::bomba_traspaso(3), Celda::pared(), Celda::enemigo(1, 0)],
+            vec![Celda::vacio(), Celda::vacio(), Celda::vacio()]
             ])
     }
     fn mapa_3_x_3_con_desvios() -> Mapa {
-        let enemigo = Celda::Enemigo { enemigo: Enemigo::new('F', 2, 0)  };
-        let vacio = Celda::Vacio { representacion: '_' };
-        let bomba = Celda::Bomba { representacion: 'S', alcance: 3, de_traspaso: false };
-        let desvio_izquierda = Celda::Desvio { representacion: 'D', direccion: 'L' };
-
         Mapa::new(vec![
-            vec![bomba.clone(), enemigo.clone(), desvio_izquierda.clone()],
-            vec![vacio.clone(), vacio.clone(), vacio.clone()],
-            vec![vacio.clone(), vacio.clone(), vacio.clone()]
+            vec![Celda::bomba_traspaso(3), Celda::enemigo(2, 0), Celda::desvio('L')],
+            vec![Celda::vacio(), Celda::vacio(), Celda::vacio()],
+            vec![Celda::vacio(), Celda::vacio(), Celda::vacio()]
             ])
     }
     #[test]
