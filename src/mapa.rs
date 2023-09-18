@@ -1,7 +1,7 @@
 use std::fs::File;
 use std::io::{self, Write, BufRead};
-use crate::Celda;
-use crate::Enemigo;
+use super::enemigo::Enemigo;
+use super::celda::Celda;
 
 /// Representa a un mapa que contiene celdas con objetos
 pub struct Mapa {
@@ -12,7 +12,6 @@ pub struct Mapa {
 
 
 impl Mapa {    
-    #[cfg(test)]
     /// Dada una grilla crea una instanc}ia de Mapa
     pub fn new(grilla: Vec<Vec<Celda>>) -> Mapa {
         Mapa { grilla }
@@ -56,11 +55,12 @@ impl Mapa {
     /// # Ejemplo
     /// Lo que sea referido como celda°n, hace referencia a una instancia de celda 
     /// ```
-    /// use mapa::Enemigo;
-    /// use celda::Celda;
+    /// use tp_individual::mapa::Mapa;
+    /// use tp_individual::celda::Celda;
+    /// let celda = Celda::Vacio{ representacion: '_' };
     /// let mapa = Mapa::new(vec![
-    ///                         vec![celda1, celda2],]
-    ///                         vec![celda3, celda4]);
+    ///                         vec![celda.clone(), celda.clone()],
+    ///                         vec![celda.clone(), celda.clone()]]);
     /// assert_eq!(mapa.obtener_largo(), 2);
     /// ```
     
@@ -83,12 +83,13 @@ impl Mapa {
     /// # Ejemplo
     /// Lo que sea referido como celda°n, hace referencia a una instancia de celda 
     /// ```
-    /// use mapa::Enemigo;
-    /// use celda::Celda;
-    /// let mapa = Mapa::new(vec![
-    ///                         vec![celda1, celda2],]
-    ///                         vec![celda3, celda4]);
-    /// assert_eq!(mapa.obtener_celda()?, &mut celda1);
+    /// use tp_individual::mapa::Mapa;
+    /// use tp_individual::celda::Celda;
+    /// let mut celda = Celda::Vacio{ representacion: '_' };
+    /// let mut mapa = Mapa::new(vec![
+    ///                         vec![celda.clone(), celda.clone()],
+    ///                         vec![celda.clone(), celda.clone()]]);
+    /// assert_eq!(mapa.obtener_celda(0, 0).unwrap(), &celda);
     /// ```
 
     // Al ser usize, la fila y columna no pueden ser menores a 0

@@ -1,13 +1,6 @@
-mod celda;
-use celda::Celda;
-mod mapa;
-mod io;
-use mapa::Mapa;
-mod explosion;
-use explosion::Explosion;
-mod enemigo;
-use enemigo::Enemigo;
-
+use tp_individual::mapa::Mapa;
+use tp_individual::explosion::Explosion;
+use tp_individual::io;
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let (file_path_origen, file_path_destino, x, y) = io::obtener_input()?;
 

@@ -1,1 +1,1 @@
-/home/juani/Taller/target/debug/tp_individual: /home/juani/Taller/src/celda.rs /home/juani/Taller/src/enemigo.rs /home/juani/Taller/src/explosion.rs /home/juani/Taller/src/io.rs /home/juani/Taller/src/main.rs /home/juani/Taller/src/mapa.rs
+/home/juani/Taller/target/debug/tp_individual: /home/juani/Taller/src/celda.rs /home/juani/Taller/src/enemigo.rs /home/juani/Taller/src/explosion.rs /home/juani/Taller/src/io.rs /home/juani/Taller/src/lib.rs /home/juani/Taller/src/main.rs /home/juani/Taller/src/mapa.rs

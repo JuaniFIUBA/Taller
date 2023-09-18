@@ -1,5 +1,4 @@
-use crate::Enemigo;
-
+use super::enemigo::Enemigo;
 /// Enum que representa los tipos de celdas/casilleros en el juego Bomberman R.
 #[derive(Debug, PartialEq, Clone)]
 pub enum Celda {

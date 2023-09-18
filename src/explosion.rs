@@ -1,7 +1,7 @@
-use crate::Mapa;
-use crate::Celda;
-use crate::Enemigo;
-use crate::io;
+use super::mapa::Mapa;
+use super::celda::Celda;
+use super::enemigo::Enemigo;
+use super::io;
 use std::error::Error;
 /// Simula una explosion 
 
@@ -27,7 +27,7 @@ impl Explosion {
     /// # Ejemplo
     ///
     /// ```
-    /// use explosion::Explosion;
+    /// use tp_individual::explosion::Explosion;
     ///
     /// let explosion = Explosion::new(3, true);
     /// ```
@@ -54,8 +54,8 @@ impl Explosion {
     /// # Ejemplo
     ///
     /// ``` ejemplo
-    /// use explosion::Explosion;
-    /// use mapa::Mapa;
+    /// use tp_individual::explosion::Explosion;
+    /// use tp_individual::mapa::Mapa;
     /// let mapa = Mapa::new(vec![vec!['B1']]);
     /// let file_path = "/home/usr/carpeta";
     /// 
@@ -84,7 +84,7 @@ impl Explosion {
 
     // Precondicion: en el lugar hay una bomba
     // borra la celda para que en caso de que se detone otra bomba, la explosion no la haga volver a explotar y generar recursion infinita.
-    // Luego llama a 4 funciones que iteran hacia las 4 direcciones posibles, detonando las celdas correspondientes al alcance  
+    // Luego llama a 4 funciones que iteran hacia las 4 direcciones posibles, detonando las celdas correspondientes al alcance.  
     fn iniciar_explosion(&mut self, mapa: &mut Mapa ,fila: i32, columna: i32) -> Result<(), Box<dyn Error>> {        
         mapa.borrar(fila as usize, columna as usize);
         self.explotar_abajo(mapa, fila, columna, self.alcance)?;
@@ -94,8 +94,7 @@ impl Explosion {
         Ok(())
     }
 
-    // Itera hacia abajo del mapa y "explota" las celdas encontradas, lo mismo para las explposiones 
-    // hacia otros lados
+    // Itera hacia abajo del mapa y "explota" las celdas encontradas, idem para las explposiones hacia otras direcciones.
     fn explotar_abajo(&mut self, mapa: &mut Mapa, fila: i32, columna: i32, alcance: i32) -> Result<(), Box<dyn Error>>{
         let mut fila_actual = fila as usize + 1;
         let mut cont: i32 = 1;
@@ -184,99 +183,103 @@ impl Explosion {
 }
 
 
-// #[cfg(test)]
+#[cfg(test)]
 
-// mod test {
-//     use super::*;
+mod test {
+    // use super::*;
+    use crate::mapa::Mapa;
+    use crate::celda::Celda;
+    use crate::enemigo::Enemigo;
+    use crate::explosion::Explosion;
+    use std::error::Error;
+    fn mapa_3_x_3 () -> Mapa {
+        let enemigo = Celda::Enemigo { enemigo: Enemigo::new('F', 1, 0)  };
+        let vacio = Celda::Vacio { representacion: '_' };
+        let bomba = Celda::Bomba { representacion: 'B', alcance: 1, de_traspaso: false };
 
-//     fn mapa_3_x_3 () -> Mapa {
-//         let enemigo = Celda::Enemigo { enemigo: Enemigo::new('F', 1, 0)  };
-//         let vacio = Celda::Vacio { representacion: '_' };
-//         let bomba = Celda::Bomba { representacion: 'B', alcance: 1, de_traspaso: false };
+        Mapa::new(vec![
+            vec![vacio.clone(), enemigo.clone(), vacio.clone()],
+            vec![enemigo.clone(), bomba.clone(), enemigo.clone()],
+            vec![vacio.clone(), enemigo.clone(), vacio.clone()]
+            ])
+    }
+    fn mapa_3_x_3_con_obstaculos() -> Mapa {
+        let enemigo = Celda::Enemigo { enemigo: Enemigo::new('F', 1, 0)  };
+        let vacio = Celda::Vacio { representacion: '_' };
+        let bomba = Celda::Bomba { representacion: 'S', alcance: 3, de_traspaso: false };
+        let roca = Celda::Obstaculo { representacion: 'R' };
+        let pared = Celda::Obstaculo { representacion: 'W' };
 
-//         Mapa::new(vec![
-//             vec![vacio.clone(), enemigo.clone(), vacio.clone()],
-//             vec![enemigo.clone(), bomba.clone(), enemigo.clone()],
-//             vec![vacio.clone(), enemigo.clone(), vacio.clone()]
-//             ])
-//     }
-//     fn mapa_3_x_3_con_obstaculos() -> Mapa {
-//         let enemigo = Celda::Enemigo { enemigo: Enemigo::new('F', 1, 0)  };
-//         let vacio = Celda::Vacio { representacion: '_' };
-//         let bomba = Celda::Bomba { representacion: 'S', alcance: 3, de_traspaso: false };
-//         let roca = Celda::Obstaculo { representacion: 'R' };
-//         let pared = Celda::Obstaculo { representacion: 'W' };
+        Mapa::new(vec![
+            vec![bomba.clone(), roca.clone(), enemigo.clone()],
+            vec![bomba.clone(), pared.clone(), enemigo.clone()],
+            vec![vacio.clone(), vacio.clone(), vacio.clone()]
+            ])
+    }
+    fn mapa_3_x_3_con_desvios() -> Mapa {
+        let enemigo = Celda::Enemigo { enemigo: Enemigo::new('F', 2, 0)  };
+        let vacio = Celda::Vacio { representacion: '_' };
+        let bomba = Celda::Bomba { representacion: 'S', alcance: 3, de_traspaso: false };
+        let desvio_izquierda = Celda::Desvio { representacion: 'D', direccion: 'L' };
 
-//         Mapa::new(vec![
-//             vec![bomba.clone(), roca.clone(), enemigo.clone()],
-//             vec![bomba.clone(), pared.clone(), enemigo.clone()],
-//             vec![vacio.clone(), vacio.clone(), vacio.clone()]
-//             ])
-//     }
-//     fn mapa_3_x_3_con_desvios() -> Mapa {
-//         let enemigo = Celda::Enemigo { enemigo: Enemigo::new('F', 2, 0)  };
-//         let vacio = Celda::Vacio { representacion: '_' };
-//         let bomba = Celda::Bomba { representacion: 'S', alcance: 3, de_traspaso: false };
-//         let desvio_izquierda = Celda::Desvio { representacion: 'D', direccion: 'L' };
+        Mapa::new(vec![
+            vec![bomba.clone(), enemigo.clone(), desvio_izquierda.clone()],
+            vec![vacio.clone(), vacio.clone(), vacio.clone()],
+            vec![vacio.clone(), vacio.clone(), vacio.clone()]
+            ])
+    }
+    #[test]
+    fn test_explotar_arriba() -> Result<(), Box<dyn Error>> {
+        let mut mapa: Mapa = mapa_3_x_3();
+        let mut expl = Explosion::new(1, false);
+        expl.explotar_arriba(&mut mapa, 1, 1, 1)?;
+        assert_eq!(mapa.obtener_celda(0, 1)?, &mut Celda::Vacio { representacion: '_' });
+        Ok(())
+    }
+    #[test]
+    fn test_explotar_abajo() -> Result<(), Box<dyn Error>> {
+        let mut mapa: Mapa = mapa_3_x_3();
+        let mut expl = Explosion::new(1, false);
+        expl.explotar_abajo(&mut mapa, 1, 1, 1)?;
+        assert_eq!(mapa.obtener_celda(2, 1)?, &mut Celda::Vacio { representacion: '_' });
+        Ok(())
+    }
+    #[test]
+    fn test_explotar_izquierda() -> Result<(), Box<dyn Error>> {
+        let mut mapa: Mapa = mapa_3_x_3();
+        let mut expl = Explosion::new(1, false);
+        expl.explotar_izquierda(&mut mapa, 1, 1, 1)?;
+        assert_eq!(mapa.obtener_celda(1, 0)?, &mut Celda::Vacio { representacion: '_' });
+        Ok(())
+    }
+    #[test]
+    fn test_explotar_derecha() -> Result<(), Box<dyn Error>> {
+        let mut mapa: Mapa = mapa_3_x_3();
+        let mut expl = Explosion::new(1, false);
+        expl.explotar_derecha(&mut mapa, 1, 1, 1)?;
+        assert_eq!(mapa.obtener_celda(1, 2)?, &mut Celda::Vacio { representacion: '_' });
+        Ok(())
+    }
+    #[test]
+    fn  test_explosion_de_traspaso_traspasa_rocas() -> Result<(), Box<dyn Error>> {
+        let mut mapa = mapa_3_x_3_con_obstaculos();
+        let mut expl = Explosion::new(3, true);
+        expl.iniciar_explosion(&mut mapa, 0, 0)?;
+        assert_eq!(mapa.obtener_celda(0, 2)?, &mut Celda::Vacio { representacion: '_' });
+        assert_eq!(mapa.obtener_celda(1, 2)?, &mut Celda::Enemigo { enemigo: Enemigo::new('F', 1, 0) });        
+        Ok(())
+    }
+    #[test]
+    fn test_misma_explosion_no_golpea_dos_veces_al_enemigo() -> Result<(), Box<dyn Error>> {
+        let mut mapa = mapa_3_x_3_con_desvios();
+        let mut expl = Explosion::new(3, false);
+        expl.iniciar_explosion(&mut mapa, 0, 0)?;
+        let enemigo = mapa.obtener_celda(0, 1)?;
+        match enemigo {
+            Celda::Enemigo { enemigo } => assert!(enemigo.esta_vivo()),
+            _ => {assert!(false)} 
+        }
+        Ok(())
+    }
 
-//         Mapa::new(vec![
-//             vec![bomba.clone(), enemigo.clone(), desvio_izquierda.clone()],
-//             vec![vacio.clone(), vacio.clone(), vacio.clone()],
-//             vec![vacio.clone(), vacio.clone(), vacio.clone()]
-//             ])
-//     }
-//     #[test]
-//     fn test_explotar_arriba() -> Result<(), Box<dyn Error>> {
-//         let mut mapa: Mapa = mapa_3_x_3();
-//         let mut expl = Explosion::new(1, false);
-//         expl.explotar_arriba(&mut mapa, 1, 1, 1)?;
-//         assert_eq!(mapa.obtener_celda(0, 1)?, &mut Celda::Vacio { representacion: '_' });
-//         Ok(())
-//     }
-//     #[test]
-//     fn test_explotar_abajo() -> Result<(), Box<dyn Error>> {
-//         let mut mapa: Mapa = mapa_3_x_3();
-//         let mut expl = Explosion::new(1, false);
-//         expl.explotar_abajo(&mut mapa, 1, 1, 1)?;
-//         assert_eq!(mapa.obtener_celda(2, 1)?, &mut Celda::Vacio { representacion: '_' });
-//         Ok(())
-//     }
-//     #[test]
-//     fn test_explotar_izquierda() -> Result<(), Box<dyn Error>> {
-//         let mut mapa: Mapa = mapa_3_x_3();
-//         let mut expl = Explosion::new(1, false);
-//         expl.explotar_izquierda(&mut mapa, 1, 1, 1)?;
-//         assert_eq!(mapa.obtener_celda(1, 0)?, &mut Celda::Vacio { representacion: '_' });
-//         Ok(())
-//     }
-//     #[test]
-//     fn test_explotar_derecha() -> Result<(), Box<dyn Error>> {
-//         let mut mapa: Mapa = mapa_3_x_3();
-//         let mut expl = Explosion::new(1, false);
-//         expl.explotar_derecha(&mut mapa, 1, 1, 1)?;
-//         assert_eq!(mapa.obtener_celda(1, 2)?, &mut Celda::Vacio { representacion: '_' });
-//         Ok(())
-//     }
-//     #[test]
-//     fn  test_explosion_de_traspaso_traspasa_rocas() -> Result<(), Box<dyn Error>> {
-//         let mut mapa = mapa_3_x_3_con_obstaculos();
-//         let mut expl = Explosion::new(3, true);
-//         expl.iniciar_explosion(&mut mapa, 0, 0)?;
-//         assert_eq!(mapa.obtener_celda(0, 2)?, &mut Celda::Vacio { representacion: '_' });
-//         assert_eq!(mapa.obtener_celda(1, 2)?, &mut Celda::Enemigo { enemigo: Enemigo::new('F', 1, 0) });        
-//         Ok(())
-//     }
-//     #[test]
-//     fn test_misma_explosion_no_golpea_dos_veces_al_enemigo() -> Result<(), Box<dyn Error>> {
-//         let mut mapa = mapa_3_x_3_con_desvios();
-//         let mut expl = Explosion::new(3, false);
-//         expl.iniciar_explosion(&mut mapa, 0, 0)?;
-//         let enemigo = mapa.obtener_celda(0, 1)?;
-//         match enemigo {
-//             Celda::Enemigo { enemigo } => assert!(enemigo.esta_vivo()),
-//             _ => {assert!(false)} 
-//         }
-//         Ok(())
-//     }
-
-// }
+}

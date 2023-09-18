@@ -24,7 +24,7 @@ impl Enemigo {
     /// # Ejemplo
     ///
     /// ```
-    /// use enemigo::Enemigo;
+    /// use tp_individual::enemigo::Enemigo;
     ///
     /// let enemigo = Enemigo::new('E', 4, 1);
     /// ```
@@ -42,7 +42,7 @@ impl Enemigo {
     /// # Ejemplo
     ///
     /// ```
-    /// use enemigo::Enemigo;
+    /// use tp_individual::enemigo::Enemigo;
     ///
     /// let enemigo = Enemigo::new('E', 4, 1);
     /// let representacion = enemigo.obtener_representacion();
@@ -66,16 +66,13 @@ impl Enemigo {
     /// # Ejemplo
     ///
     /// ```
-    /// use enemigo::Enemigo;
+    /// use tp_individual::enemigo::Enemigo;
     ///
     /// let mut enemigo = Enemigo::new('E', 2, 1);
     /// assert!(enemigo.esta_vivo());
     ///
     /// enemigo.herir();
     /// assert!(enemigo.esta_vivo());
-    ///
-    /// enemigo.pv = 0;
-    /// assert!(!enemigo.esta_vivo());
     /// ```
     pub fn esta_vivo(&self) -> bool {
         self.pv != 0

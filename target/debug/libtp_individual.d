@@ -1,0 +1,1 @@
+/home/juani/Taller/target/debug/libtp_individual.rlib: /home/juani/Taller/src/celda.rs /home/juani/Taller/src/enemigo.rs /home/juani/Taller/src/explosion.rs /home/juani/Taller/src/io.rs /home/juani/Taller/src/lib.rs /home/juani/Taller/src/mapa.rs
