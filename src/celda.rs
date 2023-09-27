@@ -87,7 +87,7 @@ impl Celda {
     /// Celda con bomba de traspaso
     pub fn bomba_traspaso(alcance: usize) -> Celda {
         Celda::Bomba {
-            representacion: 'B',
+            representacion: 'S',
             alcance,
             de_traspaso: true,
         }
