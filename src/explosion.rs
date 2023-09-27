@@ -390,13 +390,13 @@ mod test {
     use crate::mapa::Mapa;
     fn mapa_3_x_3() -> Mapa {
         Mapa::new(vec![
-            vec![Celda::vacio(), Celda::enemigo(1, 0), Celda::vacio()],
+            vec![Celda::vacio(), Celda::enemigo(1, 0, 1), Celda::vacio()],
             vec![
-                Celda::enemigo(1, 0),
+                Celda::enemigo(1, 1, 0),
                 Celda::bomba_normal(1),
-                Celda::enemigo(1, 0),
+                Celda::enemigo(1, 1, 2),
             ],
-            vec![Celda::vacio(), Celda::enemigo(1, 0), Celda::vacio()],
+            vec![Celda::vacio(), Celda::enemigo(1, 2, 1), Celda::vacio()],
         ])
     }
     fn mapa_3_x_3_con_obstaculos() -> Mapa {
@@ -404,12 +404,12 @@ mod test {
             vec![
                 Celda::bomba_traspaso(3),
                 Celda::roca(),
-                Celda::enemigo(1, 0),
+                Celda::enemigo(1, 0, 2),
             ],
             vec![
                 Celda::bomba_traspaso(3),
                 Celda::pared(),
-                Celda::enemigo(1, 0),
+                Celda::enemigo(1, 1, 3),
             ],
             vec![Celda::vacio(), Celda::vacio(), Celda::vacio()],
         ])
@@ -418,7 +418,7 @@ mod test {
         Mapa::new(vec![
             vec![
                 Celda::bomba_traspaso(3),
-                Celda::enemigo(2, 0),
+                Celda::enemigo(2, 0, 1),
                 Celda::desvio('L'),
             ],
             vec![Celda::vacio(), Celda::vacio(), Celda::vacio()],

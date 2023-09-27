@@ -31,11 +31,11 @@ impl Mapa {
             File::open(file_path).map_err(|err| format!("Error al abrir el archivo{}. ", err))?;
         let reader = io::BufReader::new(file);
         let mut filas: Vec<Vec<Celda>> = Vec::new();
-        let mut cant_enemigos: u32 = 0;
+        let mut fila: u32 = 0;
         // Itera sobre las líneas del archivo
         for line in reader.lines() {
             let line = line?;
-
+            let mut col: u32 = 0;
             let mut cols: Vec<Celda> = Vec::new();
 
             // Divide la línea en palabras usando espacios como separadores
@@ -43,9 +43,11 @@ impl Mapa {
             // Itera a través de las palabras y las pushea al el vector cols
 
             for palabra in palabras {
-                cols.push(crear_objeto(palabra, &mut cant_enemigos)?);
+                cols.push(crear_objeto(palabra,  fila, col)?);
+                col += 1;
             }
             filas.push(cols);
+            fila += 1;
         }
         Ok(Mapa { grilla: filas })
     }
@@ -165,7 +167,8 @@ impl Mapa {
 // que esta bien, ya que podrian tener los mismos puntos de vida y no ser el mismo enemigo
 fn crear_objeto(
     palabra: &str,
-    cant_enemigos: &mut u32,
+    fila: u32, 
+    col: u32,
 ) -> Result<Celda, Box<dyn std::error::Error>> {
     // let obj = palabra.chars().next().ok_or("La cadena esta vacia")?;
     let (repr, atrib) = palabra.split_at(1);
@@ -183,8 +186,7 @@ fn crear_objeto(
         'W' => Ok(Celda::pared()),
         'F' => {
             let pv = atrib.parse::<usize>()?;
-            *cant_enemigos += 1;
-            Ok(Celda::enemigo(pv, *cant_enemigos))
+            Ok(Celda::enemigo(pv, fila, col))
         }
         'D' => {
             let dir = atrib.chars().next().ok_or("Dirección de desvío inválida")?;

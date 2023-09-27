@@ -35,13 +35,13 @@ fn obtener_file_name(file_path: &str) -> Result<String, Box<dyn Error>>{
         } else {
             Err(Box::new(std::io::Error::new(
                 std::io::ErrorKind::Other,
-                "error",
+                "Error al pasar el nombre del archivo a string",
             )))
         }
     } else {
         Err(Box::new(std::io::Error::new(
             std::io::ErrorKind::Other,
-            "error",
+            "Error al obtener el nombre del archivo",
         )))
     }
 

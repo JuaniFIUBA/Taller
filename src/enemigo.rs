@@ -6,9 +6,10 @@ pub struct Enemigo {
 
     /// Puntos de vida del enemigo.
     pv: usize,
-
-    /// Identificador único para distinguir entre distintas instancias de enemigos.
-    id: u32,
+    /// Posicion horizontal del enemigo
+    fila: u32,
+    /// Posicion vertical del enemigo
+    col: u32,
 }
 
 impl Enemigo {
@@ -26,13 +27,14 @@ impl Enemigo {
     /// ```
     /// use tp_individual::enemigo::Enemigo;
     ///
-    /// let enemigo = Enemigo::new('E', 4, 1);
+    /// let enemigo = Enemigo::new('E', 4, 0, 0);
     /// ```
-    pub fn new(representacion: char, pv: usize, id: u32) -> Enemigo {
+    pub fn new(representacion: char, pv: usize, fila: u32, col: u32) -> Enemigo {
         Enemigo {
             representacion,
             pv,
-            id,
+            fila,
+            col,
         }
     }
 
@@ -44,7 +46,7 @@ impl Enemigo {
     /// ```
     /// use tp_individual::enemigo::Enemigo;
     ///
-    /// let enemigo = Enemigo::new('E', 4, 1);
+    /// let enemigo = Enemigo::new('E', 4, 0, 0);
     /// let representacion = enemigo.obtener_representacion();
     /// assert_eq!(representacion, "E4");
     /// ```
@@ -68,7 +70,7 @@ impl Enemigo {
     /// ```
     /// use tp_individual::enemigo::Enemigo;
     ///
-    /// let mut enemigo = Enemigo::new('E', 2, 1);
+    /// let mut enemigo = Enemigo::new('E', 2, 0, 0);
     /// assert!(enemigo.esta_vivo());
     ///
     /// enemigo.herir();

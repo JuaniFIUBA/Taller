@@ -108,9 +108,9 @@ impl Celda {
     ///
     /// Celda con enemigo
 
-    pub fn enemigo(pv: usize, id: u32) -> Celda {
+    pub fn enemigo(pv: usize, fila: u32, col: u32) -> Celda {
         Celda::Enemigo {
-            enemigo: Enemigo::new('F', pv, id),
+            enemigo: Enemigo::new('F', pv, fila, col),
         }
     }
 
