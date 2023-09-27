@@ -31,23 +31,19 @@ impl Mapa {
             File::open(file_path).map_err(|err| format!("Error al abrir el archivo{}. ", err))?;
         let reader = io::BufReader::new(file);
         let mut filas: Vec<Vec<Celda>> = Vec::new();
-        let mut fila: u32 = 0;
         // Itera sobre las líneas del archivo
-        for line in reader.lines() {
+        for (fila,line)  in (0_u32..).zip(reader.lines()) {
             let line = line?;
-            let mut col: u32 = 0;
             let mut cols: Vec<Celda> = Vec::new();
 
             // Divide la línea en palabras usando espacios como separadores
             let palabras: Vec<&str> = line.split_whitespace().collect();
             // Itera a través de las palabras y las pushea al el vector cols
 
-            for palabra in palabras {
+            for (col, palabra) in (0_u32..).zip(palabras.into_iter()) {
                 cols.push(crear_objeto(palabra,  fila, col)?);
-                col += 1;
             }
             filas.push(cols);
-            fila += 1;
         }
         Ok(Mapa { grilla: filas })
     }

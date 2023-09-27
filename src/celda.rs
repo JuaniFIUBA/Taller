@@ -1,7 +1,11 @@
 use super::enemigo::Enemigo;
 #[derive(Debug, Clone, PartialEq)]
+
+/// Enum que representa los tipos de bombas disponibles
 pub enum TipoDeBomba { 
+    /// Bomba comun, sin traspaso
     BombaOrdinaria,
+    /// Bomba con capacidad de traspasar rocas
     BombaDeTraspaso
 }
 /// Enum que representa los tipos de celdas/casilleros en el juego Bomberman R.
@@ -10,7 +14,7 @@ pub enum Celda {
     /// Celda vacia con una representación de un carácter.
     Vacio { representacion: char },
 
-    /// Celda de bomba con una representación de un carácter, alcance y propiedad de traspaso.
+    /// Celda de bomba con una representación de un carácter, alcance y un tipo.
     Bomba {
         representacion: char,
         alcance: usize,
@@ -129,24 +133,6 @@ impl Celda {
         }
     }
 
-    
-    // /// Obtiene la representación de la celda como un string.   
-    // pub fn obtener_representacion(&self) -> String {
-    //     match self {
-    //         Celda::Vacio { representacion } => representacion.to_string(),
-    //         Celda::Bomba {
-    //             representacion,
-    //             alcance,
-    //             tipo_bomba: _,
-    //         } => representacion.to_string() + &alcance.to_string(),
-    //         Celda::Obstaculo { representacion } => representacion.to_string(),
-    //         Celda::Enemigo { enemigo } => enemigo.obtener_representacion(),
-    //         Celda::Desvio {
-    //             representacion,
-    //             direccion,
-    //         } => representacion.to_string() + &direccion.to_string(),
-    //     }
-    // }
 }
 
 
@@ -154,7 +140,7 @@ trait Display {
     fn display(&self) -> String;
 }
 
-// Un trait que define el comportamiento de ObtenerRepresentacion
+/// Devuelve la repesentacion de una celda en forma de String 
 pub trait ObtenerRepresentacion {
     fn obtener_representacion(&self) -> String;
 }
