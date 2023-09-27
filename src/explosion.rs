@@ -167,10 +167,10 @@ impl Explosion {
         columna: i32,
     ) -> Result<(), Box<dyn Error>> {
         mapa.borrar(fila as usize, columna as usize);
-        self.explotar_abajo(mapa, fila, columna, self.alcance)?;
-        self.explotar_arriba(mapa, fila, columna, self.alcance)?;
-        self.explotar_derecha(mapa, fila, columna, self.alcance)?;
-        self.explotar_izquierda(mapa, fila, columna, self.alcance)?;
+        self.explotar_abajo(mapa, fila, columna, &mut 1)?;
+        self.explotar_arriba(mapa, fila, columna, &mut 1)?;
+        self.explotar_derecha(mapa, fila, columna, &mut 1)?;
+        self.explotar_izquierda(mapa, fila, columna, &mut 1)?;
         Ok(())
     }
 
@@ -180,16 +180,15 @@ impl Explosion {
         mapa: &mut Mapa,
         fila: i32,
         columna: i32,
-        alcance: i32,
+        iteracion: &mut i32,
     ) -> Result<(), Box<dyn Error>> {
         self.sentido = ABAJO;
         let mut fila_actual = fila as usize + 1;
-        let mut cont: i32 = 1;
-        while fila_actual < mapa.obtener_largo() && cont <= alcance {
-            if !self.explotar_celda(mapa, fila_actual, columna as usize, &mut cont)? {
+        while fila_actual < mapa.obtener_largo() && *iteracion <= self.alcance {
+            if !self.explotar_celda(mapa, fila_actual, columna as usize, iteracion)? {
                 break;
             }
-            cont += 1;
+            *iteracion += 1;
             fila_actual += 1;
         }
         Ok(())
@@ -200,16 +199,15 @@ impl Explosion {
         mapa: &mut Mapa,
         fila: i32,
         columna: i32,
-        alcance: i32,
+        iteracion: &mut i32,
     ) -> Result<(), Box<dyn Error>> {
         self.sentido = ARRIBA;
         let mut fila_actual = fila - 1;
-        let mut cont: i32 = 1; // Empieza en 1 porque estoy en el siguiente casillero de la expl
-        while fila_actual >= 0 && cont <= alcance {
-            if !self.explotar_celda(mapa, fila_actual as usize, columna as usize, &mut cont)? {
+        while fila_actual >= 0 && *iteracion <= self.alcance {
+            if !self.explotar_celda(mapa, fila_actual as usize, columna as usize, iteracion)? {
                 break;
             }
-            cont += 1;
+            *iteracion += 1;
             fila_actual -= 1;
         }
         Ok(())
@@ -220,16 +218,15 @@ impl Explosion {
         mapa: &mut Mapa,
         fila: i32,
         columna: i32,
-        alcance: i32,
+        iteracion: &mut i32,
     ) -> Result<(), Box<dyn Error>> {
         self.sentido = DERECHA;
         let mut columna_actual = columna as usize + 1;
-        let mut cont: i32 = 1;
-        while columna_actual < mapa.obtener_largo() && cont <= alcance {
-            if !self.explotar_celda(mapa, fila as usize, columna_actual, &mut cont)? {
+        while columna_actual < mapa.obtener_largo() && *iteracion <= self.alcance {
+            if !self.explotar_celda(mapa, fila as usize, columna_actual, iteracion)? {
                 break;
             }
-            cont += 1;
+            *iteracion += 1;
             columna_actual += 1;
         }
         Ok(())
@@ -240,16 +237,15 @@ impl Explosion {
         mapa: &mut Mapa,
         fila: i32,
         columna: i32,
-        alcance: i32,
+        iteracion: &mut i32,
     ) -> Result<(), Box<dyn Error>> {
         self.sentido = IZQUIERDA;
         let mut columna_actual = columna - 1;
-        let mut cont: i32 = 1;
-        while columna_actual >= 0 && cont <= alcance {
-            if !self.explotar_celda(mapa, fila as usize, columna_actual as usize, &mut cont)? {
+        while columna_actual >= 0 && *iteracion <= self.alcance {
+            if !self.explotar_celda(mapa, fila as usize, columna_actual as usize, iteracion)? {
                 break;
             }
-            cont += 1;
+            *iteracion += 1;
             columna_actual -= 1;
         }
         Ok(())
@@ -309,35 +305,39 @@ impl Explosion {
                 match *direccion {
                     // desref y ref no mutable para comparar
                     ARRIBA => {
+                        *cont += 1;
                         self.explotar_arriba(
                             mapa,
                             fila as i32,
                             columna as i32,
-                            self.alcance - *cont,
+                            cont,
                         )?;
                     }
                     ABAJO => {
+                        *cont += 1;
                         self.explotar_abajo(
                             mapa,
                             fila as i32,
                             columna as i32,
-                            self.alcance - *cont,
+                            cont,
                         )?;
                     }
                     DERECHA => {
+                        *cont += 1;
                         self.explotar_derecha(
                             mapa,
                             fila as i32,
                             columna as i32,
-                            self.alcance - *cont,
+                            cont,
                         )?;
                     }
                     IZQUIERDA => {
+                        *cont += 1;
                         self.explotar_izquierda(
                             mapa,
                             fila as i32,
                             columna as i32,
-                            self.alcance - *cont,
+                            cont,
                         )?;
                     }
                     _ => {
@@ -406,7 +406,7 @@ mod test {
     fn test_explotar_arriba() {
         let mut mapa: Mapa = mapa_3_x_3();
         let mut expl = Explosion::new(1, false);
-        expl.explotar_arriba(&mut mapa, 1, 1, 1).unwrap();
+        expl.explotar_arriba(&mut mapa, 1, 1, &mut 1).unwrap();
         assert_eq!(
             mapa.obtener_celda(0, 1).unwrap(),
             &mut Celda::Vacio {
@@ -418,7 +418,7 @@ mod test {
     fn test_explotar_abajo() {
         let mut mapa: Mapa = mapa_3_x_3();
         let mut expl = Explosion::new(1, false);
-        expl.explotar_abajo(&mut mapa, 1, 1, 1).unwrap();
+        expl.explotar_abajo(&mut mapa, 1, 1, &mut 1).unwrap();
         assert_eq!(
             mapa.obtener_celda(2, 1).unwrap(),
             &mut Celda::Vacio {
@@ -430,7 +430,7 @@ mod test {
     fn test_explotar_izquierda() {
         let mut mapa: Mapa = mapa_3_x_3();
         let mut expl = Explosion::new(1, false);
-        expl.explotar_izquierda(&mut mapa, 1, 1, 1).unwrap();
+        expl.explotar_izquierda(&mut mapa, 1, 1, &mut 1).unwrap();
         assert_eq!(
             mapa.obtener_celda(1, 0).unwrap(),
             &mut Celda::Vacio {
@@ -442,7 +442,7 @@ mod test {
     fn test_explotar_derecha() {
         let mut mapa: Mapa = mapa_3_x_3();
         let mut expl = Explosion::new(1, false);
-        expl.explotar_derecha(&mut mapa, 1, 1, 1).unwrap();
+        expl.explotar_derecha(&mut mapa, 1, 1, &mut 1).unwrap();
         assert_eq!(
             mapa.obtener_celda(1, 2).unwrap(),
             &mut Celda::Vacio {
@@ -454,7 +454,7 @@ mod test {
     fn test_explosion_de_traspaso_traspasa_rocas() {
         let mut mapa = mapa_3_x_3_con_obstaculos(); // tiene bomba, roca, enemigo en la primer fila
         let mut expl = Explosion::new(3, true);
-        expl.explotar_derecha(&mut mapa, 0, 0, 3).unwrap();
+        expl.explotar_derecha(&mut mapa, 0, 0, &mut 1).unwrap();
         assert_eq!(
             mapa.obtener_celda(0, 2).unwrap(),
             &mut Celda::Vacio {
@@ -466,7 +466,7 @@ mod test {
     fn test_misma_explosion_no_golpea_dos_veces_al_enemigo() {
         let mut mapa = mapa_3_x_3_con_desvios();
         let mut expl = Explosion::new(3, false);
-        expl.explotar_derecha(&mut mapa, 0, 0, 3).unwrap();
+        expl.explotar_derecha(&mut mapa, 0, 0, &mut 3).unwrap();
         let enemigo = mapa.obtener_celda(0, 1).unwrap();
         match enemigo {
             Celda::Enemigo { enemigo } => assert!(enemigo.esta_vivo()),
