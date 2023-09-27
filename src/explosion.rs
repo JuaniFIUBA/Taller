@@ -1,3 +1,5 @@
+use crate::celda::TipoDeBomba;
+
 use super::celda::Celda;
 use super::enemigo::Enemigo;
 use super::io;
@@ -94,10 +96,16 @@ impl Explosion {
                     Celda::Bomba {
                         representacion: _,
                         alcance,
-                        de_traspaso,
+                        tipo_bomba,
                     } => {
-                        Explosion::new(*alcance as i32, *de_traspaso)
+                        if *tipo_bomba == TipoDeBomba::BombaDeTraspaso {
+                            Explosion::new(*alcance as i32, true)
+                            .iniciar_explosion(mapa, y, x)?;    
+                        } else {
+                            Explosion::new(*alcance as i32, false)
                             .iniciar_explosion(mapa, y, x)?;
+
+                        }
                     }
                     _ => {
                         io::guardar_error_y_salir(
@@ -134,10 +142,16 @@ impl Explosion {
                     Celda::Bomba {
                         representacion: _,
                         alcance,
-                        de_traspaso,
+                        tipo_bomba,
                     } => {
-                        Explosion::new(*alcance as i32, *de_traspaso)
+                        if *tipo_bomba == TipoDeBomba::BombaDeTraspaso {
+                            Explosion::new(*alcance as i32, true)
+                            .iniciar_explosion(mapa, y, x)?;    
+                        } else {
+                            Explosion::new(*alcance as i32, false)
                             .iniciar_explosion(mapa, y, x)?;
+
+                        }
                     }
                     _ => {
                         return Err(Box::new(std::io::Error::new(
@@ -268,13 +282,22 @@ impl Explosion {
             Celda::Bomba {
                 representacion: _,
                 alcance,
-                de_traspaso,
+                tipo_bomba,
             } => {
-                Explosion::new(*alcance as i32, *de_traspaso).iniciar_explosion(
-                    mapa,
-                    fila as i32,
-                    columna as i32,
-                )?;
+                if *tipo_bomba == TipoDeBomba::BombaDeTraspaso {
+                    Explosion::new(*alcance as i32, true).iniciar_explosion(
+                        mapa,
+                        fila as i32,
+                        columna as i32,
+                    )?;
+                } else {
+                    Explosion::new(*alcance as i32, false).iniciar_explosion(
+                        mapa,
+                        fila as i32,
+                        columna as i32,
+                    )?;
+
+                }
                 Ok(true)
             }
             Celda::Obstaculo { representacion } => {

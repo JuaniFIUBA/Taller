@@ -1,4 +1,9 @@
 use super::enemigo::Enemigo;
+#[derive(Debug, Clone, PartialEq)]
+pub enum TipoDeBomba { 
+    BombaOrdinaria,
+    BombaDeTraspaso
+}
 /// Enum que representa los tipos de celdas/casilleros en el juego Bomberman R.
 #[derive(Debug, PartialEq, Clone)]
 pub enum Celda {
@@ -9,7 +14,7 @@ pub enum Celda {
     Bomba {
         representacion: char,
         alcance: usize,
-        de_traspaso: bool,
+        tipo_bomba: TipoDeBomba,
     },
 
     /// Celda de obstáculo con una representación de un carácter.
@@ -73,7 +78,7 @@ impl Celda {
         Celda::Bomba {
             representacion: 'B',
             alcance,
-            de_traspaso: false,
+            tipo_bomba: TipoDeBomba::BombaOrdinaria,
         }
     }
 
@@ -89,7 +94,7 @@ impl Celda {
         Celda::Bomba {
             representacion: 'S',
             alcance,
-            de_traspaso: true,
+            tipo_bomba: TipoDeBomba::BombaDeTraspaso,
         }
     }
 
@@ -130,7 +135,7 @@ impl Celda {
             Celda::Bomba {
                 representacion,
                 alcance,
-                de_traspaso: _,
+                tipo_bomba: _,
             } => representacion.to_string() + &alcance.to_string(),
             Celda::Obstaculo { representacion } => representacion.to_string(),
             Celda::Enemigo { enemigo } => enemigo.obtener_representacion(),

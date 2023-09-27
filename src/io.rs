@@ -2,6 +2,8 @@ use std::env;
 use std::error::Error;
 use std::fs::File;
 use std::io::Write;
+use std::path::Path;
+
 
 /// Obtiene de los argumentos y devuelve los file paths destino y origen, junto con las coordenadas, si la cantidad de argumentos es
 /// menor a 5, retorna un error. En caso de error al convertir las coordenadas, escribe en el directorio indicado por
@@ -15,12 +17,33 @@ pub fn obtener_input() -> Result<(String, String, i32, i32), Box<dyn Error>> {
             "La forma de llamar al programa es: cargo run -- mapa.txt /path/to/output_dir/ x y",
         )));
     }
-    let file_path_origen = args[1].to_string();
-    let file_path_destino: String = format!("{}{}", args[2], args[1]);
+    let file_path_origen = obtener_file_name(&args[1])?;
+    
+    let file_path_destino: String = format!("{}{}", args[2], file_path_origen);
     let x = formatear_coordenada(&args[3], &file_path_destino)?;
     let y = formatear_coordenada(&args[4], &file_path_destino)?;
 
     Ok((file_path_origen, file_path_destino, x, y))
+}
+
+fn obtener_file_name(file_path: &str) -> Result<String, Box<dyn Error>>{
+    let file_path_origen = Path::new(file_path);
+    if let Some(nombre_archivo) = file_path_origen.file_name() {
+        if let Some(file_name_str) = nombre_archivo.to_str() {
+            Ok(file_name_str.to_string())
+        } else {
+            Err(Box::new(std::io::Error::new(
+                std::io::ErrorKind::Other,
+                "error",
+            )))
+        }
+    } else {
+        Err(Box::new(std::io::Error::new(
+            std::io::ErrorKind::Other,
+            "error",
+        )))
+    }
+
 }
 
 /// Guarda un mensaje de error en un archivo cuyo nombre coincide con el archivo input, pero puede ser escrito en otro directorio
