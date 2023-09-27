@@ -128,8 +128,38 @@ impl Celda {
             direccion,
         }
     }
-    /// Obtiene la representación de la celda como un string.
-    pub fn obtener_representacion(&self) -> String {
+
+    
+    // /// Obtiene la representación de la celda como un string.   
+    // pub fn obtener_representacion(&self) -> String {
+    //     match self {
+    //         Celda::Vacio { representacion } => representacion.to_string(),
+    //         Celda::Bomba {
+    //             representacion,
+    //             alcance,
+    //             tipo_bomba: _,
+    //         } => representacion.to_string() + &alcance.to_string(),
+    //         Celda::Obstaculo { representacion } => representacion.to_string(),
+    //         Celda::Enemigo { enemigo } => enemigo.obtener_representacion(),
+    //         Celda::Desvio {
+    //             representacion,
+    //             direccion,
+    //         } => representacion.to_string() + &direccion.to_string(),
+    //     }
+    // }
+}
+
+
+trait Display {
+    fn display(&self) -> String;
+}
+
+// Un trait que define el comportamiento de ObtenerRepresentacion
+pub trait ObtenerRepresentacion {
+    fn obtener_representacion(&self) -> String;
+}
+impl ObtenerRepresentacion for Celda {
+    fn obtener_representacion(&self) -> String {
         match self {
             Celda::Vacio { representacion } => representacion.to_string(),
             Celda::Bomba {
@@ -146,3 +176,9 @@ impl Celda {
         }
     }
 }
+impl std::fmt::Display for Celda {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let representacion = self.obtener_representacion();
+        write!(f, "{}", representacion)
+    }
+}   

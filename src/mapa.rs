@@ -1,4 +1,5 @@
 use super::celda::Celda;
+use super::celda::ObtenerRepresentacion;
 use std::fs::File;
 use std::io::{self, BufRead, Write};
 
@@ -27,7 +28,7 @@ impl Mapa {
     pub fn crear_mapa(file_path: &str) -> Result<Mapa, Box<dyn std::error::Error>> {
         // Abre el archivo en modo lectura
         let file =
-            File::open(file_path).map_err(|err| format!("Error al abrir el archivo{}", err))?;
+            File::open(file_path).map_err(|err| format!("Error al abrir el archivo{}. ", err))?;
         let reader = io::BufReader::new(file);
         let mut filas: Vec<Vec<Celda>> = Vec::new();
         let mut cant_enemigos: u32 = 0;
@@ -110,7 +111,7 @@ impl Mapa {
     pub fn mostrar_mapa(&self) {
         for fila in &self.grilla {
             for columna in fila {
-                print!(" {}", columna.obtener_representacion());
+                print!(" {}", columna);
             }
             println!();
         }

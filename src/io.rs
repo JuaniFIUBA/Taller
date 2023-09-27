@@ -17,9 +17,10 @@ pub fn obtener_input() -> Result<(String, String, i32, i32), Box<dyn Error>> {
             "La forma de llamar al programa es: cargo run -- mapa.txt /path/to/output_dir/ x y",
         )));
     }
-    let file_path_origen = obtener_file_name(&args[1])?;
+    let file_path_origen = args[1].to_string();
+    let file_name = obtener_file_name(&args[1])?;
     
-    let file_path_destino: String = format!("{}{}", args[2], file_path_origen);
+    let file_path_destino: String = format!("{}{}", args[2], file_name);
     let x = formatear_coordenada(&args[3], &file_path_destino)?;
     let y = formatear_coordenada(&args[4], &file_path_destino)?;
 
