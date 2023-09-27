@@ -1,10 +1,10 @@
 use crate::celda::TipoDeBomba;
 
 use super::celda::Celda;
-use super::enemigo::Enemigo;
 use super::io;
 use super::mapa::Mapa;
 use std::error::Error;
+
 /// Simula una explosion
 
 const ARRIBA: char = 'U';
@@ -22,8 +22,8 @@ pub struct Explosion {
     /// Indica el sentido de la explosion en todo momento
     sentido: char,
 
-    /// Enemigos afectados por la explosión, se utiliza para no golpear dos veces al mismo enemigo con la misma explosión
-    enemigos_afectados: Vec<Enemigo>,
+    /// Posicion de Enemigos afectados por la explosión, se utiliza para no golpear dos veces al mismo enemigo con la misma explosión
+    enemigos_afectados: Vec<(usize, usize)>,
 }
 
 impl Explosion {
@@ -310,11 +310,11 @@ impl Explosion {
                 } // check en caso de que traspase y se trate de una roca
             }
             Celda::Enemigo { enemigo } => {
-                if !self.enemigos_afectados.contains(enemigo) {
+                if !self.enemigos_afectados.contains(&(fila, columna)) {
                     enemigo.herir();
-                    self.enemigos_afectados.push(*enemigo);
+                    self.enemigos_afectados.push((fila, columna));
                     if !enemigo.esta_vivo() {
-                        mapa.borrar(fila, columna)
+                        mapa.borrar(fila, columna)  
                     }
                 }
                 Ok(true)
@@ -390,13 +390,13 @@ mod test {
     use crate::mapa::Mapa;
     fn mapa_3_x_3() -> Mapa {
         Mapa::new(vec![
-            vec![Celda::vacio(), Celda::enemigo(1, 0, 1), Celda::vacio()],
+            vec![Celda::vacio(), Celda::enemigo(1), Celda::vacio()],
             vec![
-                Celda::enemigo(1, 1, 0),
+                Celda::enemigo(1),
                 Celda::bomba_normal(1),
-                Celda::enemigo(1, 1, 2),
+                Celda::enemigo(1),
             ],
-            vec![Celda::vacio(), Celda::enemigo(1, 2, 1), Celda::vacio()],
+            vec![Celda::vacio(), Celda::enemigo(1), Celda::vacio()],
         ])
     }
     fn mapa_3_x_3_con_obstaculos() -> Mapa {
@@ -404,12 +404,12 @@ mod test {
             vec![
                 Celda::bomba_traspaso(3),
                 Celda::roca(),
-                Celda::enemigo(1, 0, 2),
+                Celda::enemigo(1),
             ],
             vec![
                 Celda::bomba_traspaso(3),
                 Celda::pared(),
-                Celda::enemigo(1, 1, 3),
+                Celda::enemigo(1),
             ],
             vec![Celda::vacio(), Celda::vacio(), Celda::vacio()],
         ])
@@ -418,7 +418,7 @@ mod test {
         Mapa::new(vec![
             vec![
                 Celda::bomba_traspaso(3),
-                Celda::enemigo(2, 0, 1),
+                Celda::enemigo(2),
                 Celda::desvio('L'),
             ],
             vec![Celda::vacio(), Celda::vacio(), Celda::vacio()],

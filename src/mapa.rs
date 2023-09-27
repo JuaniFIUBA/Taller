@@ -32,17 +32,16 @@ impl Mapa {
         let reader = io::BufReader::new(file);
         let mut filas: Vec<Vec<Celda>> = Vec::new();
         // Itera sobre las líneas del archivo
-        for (fila,line)  in (0_u32..).zip(reader.lines()) {
+        for line  in reader.lines() {
             let line = line?;
             let mut cols: Vec<Celda> = Vec::new();
 
             // Divide la línea en palabras usando espacios como separadores
             let palabras: Vec<&str> = line.split_whitespace().collect();
             // Itera a través de las palabras y las pushea al el vector cols
-
-            for (col, palabra) in (0_u32..).zip(palabras.into_iter()) {
-                cols.push(crear_objeto(palabra,  fila, col)?);
-            }
+            for palabra in palabras {
+                cols.push(crear_objeto(palabra)?);
+                }
             filas.push(cols);
         }
         Ok(Mapa { grilla: filas })
@@ -157,14 +156,12 @@ impl Mapa {
 }
 
 // Crea un tipo de dato perteneciente al enum Celda a partir de un string.
-// El argumento cant_enemigos se utiliza para asignarle un id en caso de que se quiera crear un enemigo.
+// Los argumentos fila, col se utilizan en caso de que se quiera crear un enemigo.
 // Esto se debe a que cuando se quiere comparar entre un enemigo y otro que por ejemplo tienen los mismos
 // atributos, rust compara 1 a 1 esos atributos y devuelve true en caso de que coincidan, que no es lo
 // que esta bien, ya que podrian tener los mismos puntos de vida y no ser el mismo enemigo
 fn crear_objeto(
     palabra: &str,
-    fila: u32, 
-    col: u32,
 ) -> Result<Celda, Box<dyn std::error::Error>> {
     // let obj = palabra.chars().next().ok_or("La cadena esta vacia")?;
     let (repr, atrib) = palabra.split_at(1);
@@ -182,7 +179,7 @@ fn crear_objeto(
         'W' => Ok(Celda::pared()),
         'F' => {
             let pv = atrib.parse::<usize>()?;
-            Ok(Celda::enemigo(pv, fila, col))
+            Ok(Celda::enemigo(pv))
         }
         'D' => {
             let dir = atrib.chars().next().ok_or("Dirección de desvío inválida")?;

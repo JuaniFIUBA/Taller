@@ -5,7 +5,7 @@ use super::enemigo::Enemigo;
 pub enum TipoDeBomba { 
     /// Bomba comun, sin traspaso
     BombaOrdinaria,
-    /// Bomba con capacidad de traspasar rocas
+    /// Bomba con capacidad de traspasar Rocas
     BombaDeTraspaso
 }
 /// Enum que representa los tipos de celdas/casilleros en el juego Bomberman R.
@@ -112,9 +112,9 @@ impl Celda {
     ///
     /// Celda con enemigo
 
-    pub fn enemigo(pv: usize, fila: u32, col: u32) -> Celda {
+    pub fn enemigo(pv: usize) -> Celda {
         Celda::Enemigo {
-            enemigo: Enemigo::new('F', pv, fila, col),
+            enemigo: Enemigo::new('F', pv),
         }
     }
 
@@ -140,7 +140,7 @@ trait Display {
     fn display(&self) -> String;
 }
 
-/// Devuelve la repesentacion de una celda en forma de String 
+// Un trait que define el comportamiento de ObtenerRepresentacion
 pub trait ObtenerRepresentacion {
     fn obtener_representacion(&self) -> String;
 }
