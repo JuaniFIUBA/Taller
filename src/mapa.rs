@@ -1,3 +1,11 @@
+use crate::celda::BOMBAORDINARIA;
+use crate::celda::BOMBATRASPASO;
+use crate::celda::DESVIO;
+use crate::celda::ENEMIGO;
+use crate::celda::PARED;
+use crate::celda::ROCA;
+use crate::celda::VACIO;
+
 use super::celda::Celda;
 use super::celda::ObtenerRepresentacion;
 use std::fs::File;
@@ -123,7 +131,7 @@ impl Mapa {
     /// * `columna`: Valor de la columna que se quiere obtener (equivale a y)
     pub fn borrar(&mut self, fila: usize, columna: usize) {
         self.grilla[fila][columna] = Celda::Vacio {
-            representacion: '_',
+            representacion: VACIO,
         };
     }
 
@@ -170,18 +178,16 @@ fn crear_objeto(
         .next()
         .ok_or("Error al objener la representacion")?;
     match obj {
-        '_' => Ok(Celda::Vacio {
-            representacion: '_',
-        }),
-        'B' => Ok(Celda::bomba_normal(atrib.parse::<usize>()?)),
-        'S' => Ok(Celda::bomba_traspaso(atrib.parse::<usize>()?)),
-        'R' => Ok(Celda::roca()),
-        'W' => Ok(Celda::pared()),
-        'F' => {
+        VACIO => Ok(Celda::vacio()),
+        BOMBAORDINARIA => Ok(Celda::bomba_normal(atrib.parse::<usize>()?)),
+        BOMBATRASPASO => Ok(Celda::bomba_traspaso(atrib.parse::<usize>()?)),
+        ROCA => Ok(Celda::roca()),
+        PARED => Ok(Celda::pared()),
+        ENEMIGO => {
             let pv = atrib.parse::<usize>()?;
             Ok(Celda::enemigo(pv))
         }
-        'D' => {
+        DESVIO => {
             let dir = atrib.chars().next().ok_or("Dirección de desvío inválida")?;
             Ok(Celda::desvio(dir))
         }
@@ -199,13 +205,13 @@ mod test {
     fn test_obtener_celda() -> Result<(), Box<dyn std::error::Error>> {
         let mut mapa = Mapa {
             grilla: vec![vec![Celda::Vacio {
-                representacion: '_',
+                representacion: VACIO,
             }]],
         };
         assert_eq!(
             mapa.obtener_celda(0, 0)?,
             &mut Celda::Vacio {
-                representacion: '_'
+                representacion: VACIO
             }
         );
         Ok(())
@@ -215,14 +221,14 @@ mod test {
     fn test_borrar_celda() -> Result<(), Box<dyn std::error::Error>> {
         let mut mapa = Mapa {
             grilla: vec![vec![Celda::Obstaculo {
-                representacion: 'R',
+                representacion: ROCA,
             }]],
         };
         mapa.borrar(0, 0);
         assert_eq!(
             mapa.obtener_celda(0, 0)?,
             &mut Celda::Vacio {
-                representacion: '_'
+                representacion: VACIO
             }
         );
         Ok(())

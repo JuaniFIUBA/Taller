@@ -27,6 +27,7 @@ pub fn obtener_input() -> Result<(String, String, i32, i32), Box<dyn Error>> {
     Ok((file_path_origen, file_path_destino, x, y))
 }
 
+// Funcion para extraer el nombre de un file_path
 fn obtener_file_name(file_path: &str) -> Result<String, Box<dyn Error>>{
     let file_path_origen = Path::new(file_path);
     if let Some(nombre_archivo) = file_path_origen.file_name() {

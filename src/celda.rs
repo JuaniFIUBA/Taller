@@ -2,13 +2,13 @@ use crate::enemigo::Enemigo;
 use crate::bomba::TipoDeBomba;
 
 
-const VACIO: char = '_';
-const BOMBAORDINARIA: char = 'B';
-const BOMBATRASPASO: char = 'S';
-const ENEMIGO: char = 'F';
-const PARED: char = 'W';
-const ROCA: char = 'R';
-const DESVIO: char = 'D';
+pub const VACIO: char = '_';
+pub const BOMBAORDINARIA: char = 'B';
+pub const BOMBATRASPASO: char = 'S';
+pub const ENEMIGO: char = 'F';
+pub const PARED: char = 'W';
+pub const ROCA: char = 'R';
+pub const DESVIO: char = 'D';
 
 /// Enum que representa los tipos de celdas/casilleros en el juego Bomberman R.
 #[derive(Debug, PartialEq, Clone)]
@@ -16,7 +16,7 @@ pub enum Celda {
     /// Celda vacia con una representación de un carácter.
     Vacio { representacion: char },
 
-    /// Celda de bomba con una representación de un carácter, alcance y un tipo.
+    /// Celda de bomba con una representación de un carácter, alcance y un tipo representado en TipoDeBomba.
     Bomba {
         representacion: char,
         alcance: usize,
