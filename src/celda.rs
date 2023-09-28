@@ -1,13 +1,15 @@
-use super::enemigo::Enemigo;
-#[derive(Debug, Clone, PartialEq)]
+use crate::enemigo::Enemigo;
+use crate::bomba::TipoDeBomba;
 
-/// Enum que representa los tipos de bombas disponibles
-pub enum TipoDeBomba { 
-    /// Bomba comun, sin traspaso
-    BombaOrdinaria,
-    /// Bomba con capacidad de traspasar Rocas
-    BombaDeTraspaso
-}
+
+const VACIO: char = '_';
+const BOMBAORDINARIA: char = 'B';
+const BOMBATRASPASO: char = 'S';
+const ENEMIGO: char = 'F';
+const PARED: char = 'W';
+const ROCA: char = 'R';
+const DESVIO: char = 'D';
+
 /// Enum que representa los tipos de celdas/casilleros en el juego Bomberman R.
 #[derive(Debug, PartialEq, Clone)]
 pub enum Celda {
@@ -42,7 +44,7 @@ impl Celda {
     /// Celda vacia
     pub fn vacio() -> Celda {
         Celda::Vacio {
-            representacion: '_',
+            representacion: VACIO,
         }
     }
 
@@ -54,7 +56,7 @@ impl Celda {
 
     pub fn pared() -> Celda {
         Celda::Obstaculo {
-            representacion: 'W',
+            representacion: PARED,
         }
     }
 
@@ -65,7 +67,7 @@ impl Celda {
     /// Celda con roca
     pub fn roca() -> Celda {
         Celda::Obstaculo {
-            representacion: 'R',
+            representacion: ROCA,
         }
     }
 
@@ -80,7 +82,7 @@ impl Celda {
     /// Celda con bomba normal
     pub fn bomba_normal(alcance: usize) -> Celda {
         Celda::Bomba {
-            representacion: 'B',
+            representacion: BOMBAORDINARIA,
             alcance,
             tipo_bomba: TipoDeBomba::BombaOrdinaria,
         }
@@ -96,7 +98,7 @@ impl Celda {
     /// Celda con bomba de traspaso
     pub fn bomba_traspaso(alcance: usize) -> Celda {
         Celda::Bomba {
-            representacion: 'S',
+            representacion: BOMBATRASPASO,
             alcance,
             tipo_bomba: TipoDeBomba::BombaDeTraspaso,
         }
@@ -114,7 +116,7 @@ impl Celda {
 
     pub fn enemigo(pv: usize) -> Celda {
         Celda::Enemigo {
-            enemigo: Enemigo::new('F', pv),
+            enemigo: Enemigo::new(ENEMIGO, pv),
         }
     }
 
@@ -128,7 +130,7 @@ impl Celda {
     /// Celda con desvio
     pub fn desvio(direccion: char) -> Celda {
         Celda::Desvio {
-            representacion: 'D',
+            representacion: DESVIO,
             direccion,
         }
     }

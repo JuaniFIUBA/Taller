@@ -1,5 +1,4 @@
-use crate::celda::TipoDeBomba;
-
+use crate::bomba::TipoDeBomba;
 use super::celda::Celda;
 use super::io;
 use super::mapa::Mapa;
